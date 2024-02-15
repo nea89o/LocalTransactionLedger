@@ -42,7 +42,8 @@ class Ledger {
             this,
             ids,
             BankDetection(ledger),
-            BazaarDetection(ledger, ids)
+            BazaarDetection(ledger, ids),
+            AuctionHouseDetection(ledger, ids),
         ).forEach(MinecraftForge.EVENT_BUS::register)
     }
 
