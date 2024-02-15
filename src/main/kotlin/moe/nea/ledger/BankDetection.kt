@@ -4,13 +4,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 
 class BankDetection(val ledger: LedgerLogger) {
-
-    /*
-        You have withdrawn 1M coins! You now have 518M coins in your account!
-        You have deposited 519M coins! You now have 519M coins in your account!
-     */
-
-
     val withdrawPattern =
         Pattern.compile("^You have withdrawn (?<amount>$SHORT_NUMBER_PATTERN) coins?! You now have (?<newtotal>$SHORT_NUMBER_PATTERN) coins? in your account!$")
     val depositPattern =

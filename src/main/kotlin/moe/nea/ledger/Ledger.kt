@@ -40,6 +40,7 @@ class Ledger {
         listOf(
             this,
             BankDetection(ledger),
+            BazaarDetection(ledger)
         ).forEach(MinecraftForge.EVENT_BUS::register)
     }
 
