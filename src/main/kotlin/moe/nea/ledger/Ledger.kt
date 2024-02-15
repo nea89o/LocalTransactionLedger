@@ -37,10 +37,12 @@ class Ledger {
     @Mod.EventHandler
     fun init(event: FMLInitializationEvent) {
         val ledger = LedgerLogger()
+        val ids = ItemIdProvider()
         listOf(
             this,
+            ids,
             BankDetection(ledger),
-            BazaarDetection(ledger)
+            BazaarDetection(ledger, ids)
         ).forEach(MinecraftForge.EVENT_BUS::register)
     }
 

@@ -3,7 +3,7 @@ package moe.nea.ledger
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 
-class BazaarDetection(val ledger: LedgerLogger) {
+class BazaarDetection(val ledger: LedgerLogger, val ids: ItemIdProvider) {
 
     val instaBuyPattern =
         Pattern.compile("\\[Bazaar\\] Bought (?<count>[0-9]+)x (?<what>.*) for (?<coins>$SHORT_NUMBER_PATTERN) coins!")
@@ -19,7 +19,7 @@ class BazaarDetection(val ledger: LedgerLogger) {
                     "BAZAAR_BUY_INSTANT",
                     event.timestamp,
                     parseShortNumber(group("coins")),
-                    group("what"),
+                    ids.findForName(group("what")),
                     group("count").toInt(),
                 )
             )
@@ -30,7 +30,7 @@ class BazaarDetection(val ledger: LedgerLogger) {
                     "BAZAAR_SELL_INSTANT",
                     event.timestamp,
                     parseShortNumber(group("coins")),
-                    group("what"),
+                    ids.findForName(group("what")),
                     group("count").toInt(),
                 )
             )

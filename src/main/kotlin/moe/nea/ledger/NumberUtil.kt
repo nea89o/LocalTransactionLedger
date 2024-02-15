@@ -30,3 +30,4 @@ fun parseShortNumber(string: String): Double {
 fun <T> Pattern.useMatcher(string: String, block: Matcher.() -> T): T? =
     matcher(string).takeIf { it.matches() }?.let(block)
 
+fun String.unformattedString(): String = replace("§.".toRegex(), "")
