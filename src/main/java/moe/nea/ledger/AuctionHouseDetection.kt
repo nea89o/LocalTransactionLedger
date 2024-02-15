@@ -21,11 +21,12 @@ class AuctionHouseDetection(val ledger: LedgerLogger, val ids: ItemIdProvider) {
         Pattern.compile("You collected (?<coins>$SHORT_NUMBER_PATTERN) coins? from selling (?<what>.*) to (?<buyer>.*) in an auction!")
     val purchased =
         Pattern.compile("You purchased (?:(?<amount>[0-9]+)x )?(?<what>.*) for (?<coins>$SHORT_NUMBER_PATTERN) coins!")
-    var lastViewedItem: LastViewedItem? = null
+    var lastViewedItems: MutableList<LastViewedItem> = mutableListOf()
 
     @SubscribeEvent
     fun onEvent(event: ChatReceived) {
         collectSold.useMatcher(event.message) {
+            val lastViewedItem = lastViewedItems.removeLastOrNull()
             ledger.logEntry(
                 LedgerEntry(
                     "AUCTION_SOLD",
@@ -43,7 +44,7 @@ class AuctionHouseDetection(val ledger: LedgerLogger, val ids: ItemIdProvider) {
                     event.timestamp,
                     parseShortNumber(group("coins")),
                     ids.findForName(group("what")),
-                    group("amount")?.let { it.toInt() } ?: 1
+                    group("amount")?.toInt() ?: 1
                 )
             )
         }
@@ -51,7 +52,6 @@ class AuctionHouseDetection(val ledger: LedgerLogger, val ids: ItemIdProvider) {
 
     @SubscribeEvent
     fun onBeforeAuctionCollected(event: BeforeGuiAction) {
-        // TODO: collect all support
         val chest = (event.gui as? GuiChest) ?: return
         val slots = chest.inventorySlots as ContainerChest
         val name = slots.lowerChestInventory.displayName.unformattedText.unformattedString()
@@ -59,6 +59,21 @@ class AuctionHouseDetection(val ledger: LedgerLogger, val ids: ItemIdProvider) {
         if (name == "BIN Auction View" || name == "Auction View") {
             handleCollectSingleAuctionView(slots)
         }
+        if (name == "Manage Auctions") {
+            handleCollectMultipleAuctionsView(slots)
+        }
+    }
+
+    private fun handleCollectMultipleAuctionsView(slots: ContainerChest) {
+        lastViewedItems =
+            (0 until slots.lowerChestInventory.sizeInventory)
+                .mapNotNull { slots.lowerChestInventory.getStackInSlot(it) }
+                .filter {
+                    it.getLore().contains("§7Status: §aSold!") // BINs
+                            || it.getLore().contains("§7Status: §aEnded!") // Auctions
+                }
+                .mapNotNull { LastViewedItem(it.stackSize, it.getInternalId() ?: return@mapNotNull null) }
+                .toMutableList()
     }
 
 
@@ -66,7 +81,7 @@ class AuctionHouseDetection(val ledger: LedgerLogger, val ids: ItemIdProvider) {
         val soldItem = slots.lowerChestInventory.getStackInSlot(9 + 4) ?: return
         val id = soldItem.getInternalId() ?: return
         val count = soldItem.stackSize
-        lastViewedItem = LastViewedItem(count, id)
+        lastViewedItems = mutableListOf(LastViewedItem(count, id))
     }
 
 

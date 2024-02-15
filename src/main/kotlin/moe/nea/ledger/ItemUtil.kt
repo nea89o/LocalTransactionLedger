@@ -11,3 +11,11 @@ fun ItemStack.getInternalId(): String? {
     return id.takeIf { it.isNotBlank() }
 }
 
+
+fun ItemStack.getLore(): List<String> {
+    val nbt = this.tagCompound ?: NBTTagCompound()
+    val extraAttributes = nbt.getCompoundTag("display")
+    val lore = extraAttributes.getTagList("Lore", 8)
+    return (0 until lore.tagCount()).map { lore.getStringTagAt(it) }
+}
+
