@@ -4,7 +4,9 @@ import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.common.event.FMLInitializationEvent
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import org.apache.logging.log4j.LogManager
 
 @Mod(modid = "ledger", useMetadata = true)
 class Ledger {
@@ -33,9 +35,13 @@ class Ledger {
 
     TODO: TRADING, FORGE, COOKIE_EATEN, NPC_SELL, NPC_BUY
     */
+    companion object {
+        val logger = LogManager.getLogger("MoneyLedger")
+    }
 
     @Mod.EventHandler
     fun init(event: FMLInitializationEvent) {
+        logger.info("Initializing ledger")
         val ledger = LedgerLogger()
         val ids = ItemIdProvider()
         listOf(
@@ -48,7 +54,7 @@ class Ledger {
         ).forEach(MinecraftForge.EVENT_BUS::register)
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(receiveCanceled = true, priority = EventPriority.HIGHEST)
     fun onChat(event: ClientChatReceivedEvent) {
         if (event.type != 2.toByte())
             MinecraftForge.EVENT_BUS.post(ChatReceived(event))

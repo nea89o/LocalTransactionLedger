@@ -9,7 +9,6 @@ data class ChatReceived(
     val timestamp: Instant = Instant.now()
 ) : Event() {
     constructor(event: ClientChatReceivedEvent) : this(
-        event.message.unformattedText
-            .replace("§.".toRegex(), "")
+        event.message.unformattedText.unformattedString()
     )
 }

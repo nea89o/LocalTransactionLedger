@@ -33,6 +33,7 @@ class LedgerLogger {
     val entries = JsonArray()
 
     fun logEntry(entry: LedgerEntry) {
+        Ledger.logger.info("Logging entry of type ${entry.transactionType}")
         entries.add(entry.intoJson())
         commit()
     }
@@ -41,7 +42,7 @@ class LedgerLogger {
         try {
             file.writeText(gson.toJson(entries))
         } catch (ex: Exception) {
-            ex.printStackTrace()
+            Ledger.logger.error("Could not save file", ex)
         }
     }
 
