@@ -5,7 +5,7 @@ import java.util.regex.Pattern
 
 class BankDetection(val ledger: LedgerLogger) {
     val withdrawPattern =
-        Pattern.compile("^(You have withdrawn|Withdrew) (?<amount>$SHORT_NUMBER_PATTERN) coins?! (?:There's now|You now have) (?<newtotal>$SHORT_NUMBER_PATTERN) coins? (?:lef in the account!|in your account!)$")
+        Pattern.compile("^(You have withdrawn|Withdrew) (?<amount>$SHORT_NUMBER_PATTERN) coins?! (?:There's now|You now have) (?<newtotal>$SHORT_NUMBER_PATTERN) coins? (?:left in the account!|in your account!)$")
     val depositPattern =
         Pattern.compile("^(?:You have deposited|Deposited) (?<amount>$SHORT_NUMBER_PATTERN) coins?! (?:There's now|You now have) (?<newtotal>$SHORT_NUMBER_PATTERN) coins? (?:in your account!|in the account!)$")
     @SubscribeEvent
