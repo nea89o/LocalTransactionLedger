@@ -78,8 +78,8 @@ data class LedgerEntry(
             addProperty("transactionType", transactionType)
             addProperty("timestamp", timestamp.toEpochMilli().toString())
             addProperty("totalTransactionValue", totalTransactionCoins)
-            addProperty("itemId", itemId)
-            addProperty("itemAmount", itemAmount)
+            addProperty("itemId", itemId ?: "")
+            addProperty("itemAmount", itemAmount ?: 0)
         }
     }
 }
