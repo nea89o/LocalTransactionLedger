@@ -1,15 +1,22 @@
 package moe.nea.ledger
 
+import com.google.gson.Gson
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
 import net.minecraft.util.ChatComponentText
+import java.io.File
+import java.text.SimpleDateFormat
 import java.time.Instant
+import java.util.*
 
 class LedgerLogger {
     fun printOut(text: String) {
         Minecraft.getMinecraft().ingameGUI?.chatGUI?.printChatMessage(ChatComponentText(text))
     }
 
-    fun logEntry(entry: LedgerEntry) {
+
+    fun printToChat(entry: LedgerEntry) {
         printOut(
             """
             §e================= TRANSACTION START
@@ -23,7 +30,40 @@ class LedgerLogger {
         )
     }
 
+    val entries = JsonArray()
+
+    fun logEntry(entry: LedgerEntry) {
+        entries.add(entry.intoJson())
+        commit()
+    }
+
+    fun commit() {
+        try {
+            file.writeText(gson.toJson(entries))
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+        }
+    }
+
+    val gson = Gson()
+
+    val file: File = run {
+        val folder = File("money-ledger")
+        folder.mkdirs()
+        val date = SimpleDateFormat("yyyy.MM.dd").format(Date())
+
+        generateSequence(0) { it + 1 }
+            .map {
+                if (it == 0)
+                    folder.resolve("$date.json")
+                else
+                    folder.resolve("$date-$it.json")
+            }
+            .filter { !it.exists() }
+            .first()
+    }
 }
+
 
 data class LedgerEntry(
     val transactionType: String,
@@ -31,4 +71,14 @@ data class LedgerEntry(
     val totalTransactionCoins: Double,
     val itemId: String? = null,
     val itemAmount: Int? = null,
-)
+) {
+    fun intoJson(): JsonObject {
+        return JsonObject().apply {
+            addProperty("transactionType", transactionType)
+            addProperty("timestamp", timestamp.toEpochMilli().toString())
+            addProperty("totalTransactionValue", totalTransactionCoins)
+            addProperty("itemId", itemId)
+            addProperty("itemAmount", itemAmount)
+        }
+    }
+}
