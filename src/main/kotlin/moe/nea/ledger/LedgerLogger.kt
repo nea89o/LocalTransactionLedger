@@ -5,6 +5,8 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
 import net.minecraft.util.ChatComponentText
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import java.io.File
 import java.text.SimpleDateFormat
 import java.time.Instant
@@ -31,6 +33,31 @@ class LedgerLogger {
     }
 
     val entries = JsonArray()
+    var hasRecentlyMerged = false
+    var lastMergeTime = System.currentTimeMillis()
+
+    fun doMerge() {
+        val allFiles = folder.listFiles()?.toList() ?: emptyList()
+        val mergedJson = allFiles
+            .filter { it.name != "merged.json" && it.extension == "json" }
+            .sortedDescending()
+            .map { it.readText().trim().removePrefix("[").removeSuffix("]") }
+            .joinToString(",", "[", "]")
+        folder.resolve("merged.json").writeText(mergedJson)
+        hasRecentlyMerged = true
+    }
+
+    init {
+        Runtime.getRuntime().addShutdownHook(Thread { doMerge() })
+    }
+
+    @SubscribeEvent
+    fun onTick(event: ClientTickEvent) {
+        if (!hasRecentlyMerged && (System.currentTimeMillis() - lastMergeTime) > 60_000L) {
+            lastMergeTime = System.currentTimeMillis()
+            doMerge()
+        }
+    }
 
     fun logEntry(entry: LedgerEntry) {
         Ledger.logger.info("Logging entry of type ${entry.transactionType}")
@@ -40,6 +67,7 @@ class LedgerLogger {
 
     fun commit() {
         try {
+            hasRecentlyMerged = false
             file.writeText(gson.toJson(entries))
         } catch (ex: Exception) {
             Ledger.logger.error("Could not save file", ex)
@@ -48,9 +76,8 @@ class LedgerLogger {
 
     val gson = Gson()
 
+    val folder = File("money-ledger").also { it.mkdirs() }
     val file: File = run {
-        val folder = File("money-ledger")
-        folder.mkdirs()
         val date = SimpleDateFormat("yyyy.MM.dd").format(Date())
 
         generateSequence(0) { it + 1 }

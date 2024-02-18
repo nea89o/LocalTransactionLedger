@@ -47,6 +47,7 @@ class Ledger {
         listOf(
             this,
             ids,
+            ledger,
             BankDetection(ledger),
             BazaarDetection(ledger, ids),
             BazaarOrderDetection(ledger, ids),
