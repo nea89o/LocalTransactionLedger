@@ -25,7 +25,8 @@ class ItemIdProvider {
     fun saveInventoryIds(event: BeforeGuiAction) {
         val chest = (event.gui as? GuiChest) ?: return
         val slots = chest.inventorySlots as ContainerChest
-        val isOrderMenu = slots.lowerChestInventory.name.unformattedString() == "Your Bazaar Orders"
+        val chestName = slots.lowerChestInventory.name.unformattedString()
+        val isOrderMenu = chestName == "Your Bazaar Orders" || chestName == "Co-op Bazar Orders"
         slots.inventorySlots.forEach {
             val stack = it.stack ?: return@forEach
             val nbt = stack.tagCompound ?: NBTTagCompound()
@@ -33,6 +34,7 @@ class ItemIdProvider {
             var name = display.getString("Name").unformattedString()
             if (isOrderMenu)
                 name = name.removePrefix("BUY ").removePrefix("SELL ")
+            name = name.trim()
             val id = stack.getInternalId()
             if (id != null && name.isNotBlank()) {
                 knownNames[name] = id
