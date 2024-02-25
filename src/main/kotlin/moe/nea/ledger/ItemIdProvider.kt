@@ -26,7 +26,7 @@ class ItemIdProvider {
         val chest = (event.gui as? GuiChest) ?: return
         val slots = chest.inventorySlots as ContainerChest
         val chestName = slots.lowerChestInventory.name.unformattedString()
-        val isOrderMenu = chestName == "Your Bazaar Orders" || chestName == "Co-op Bazar Orders"
+        val isOrderMenu = chestName == "Your Bazaar Orders" || chestName == "Co-op Bazaar Orders"
         slots.inventorySlots.forEach {
             val stack = it.stack ?: return@forEach
             val nbt = stack.tagCompound ?: NBTTagCompound()
