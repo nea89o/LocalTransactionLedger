@@ -1,6 +1,8 @@
 package moe.nea.ledger
 
 import net.minecraft.client.Minecraft
+import net.minecraft.command.CommandBase
+import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.event.entity.EntityJoinWorldEvent

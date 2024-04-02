@@ -4,7 +4,10 @@ import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
+import net.minecraft.command.CommandBase
+import net.minecraft.command.ICommandSender
 import net.minecraft.util.ChatComponentText
+import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import java.io.File
@@ -21,6 +24,29 @@ class LedgerLogger {
         "Profile ID: (?<profile>[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})".toPattern()
 
     var currentProfile: String? = null
+
+    var shouldLog = false
+
+    init {
+        ClientCommandHandler.instance.registerCommand(object : CommandBase() {
+            override fun getCommandName(): String {
+                return "ledgerlogchat"
+            }
+
+            override fun canCommandSenderUseCommand(sender: ICommandSender?): Boolean {
+                return true
+            }
+
+            override fun getCommandUsage(sender: ICommandSender?): String {
+                return ""
+            }
+
+            override fun processCommand(sender: ICommandSender?, args: Array<out String>?) {
+                shouldLog = !shouldLog
+                printOut("§eLedger logging toggled " + (if (shouldLog) "§aon" else "§coff") + "§e.")
+            }
+        })
+    }
 
     @SubscribeEvent
     fun onProfileSwitch(event: ChatReceived) {
@@ -73,6 +99,8 @@ class LedgerLogger {
     }
 
     fun logEntry(entry: LedgerEntry) {
+        if (shouldLog)
+            printToChat(entry)
         Ledger.logger.info("Logging entry of type ${entry.transactionType}")
         entries.add(entry.intoJson(currentProfile))
         commit()
