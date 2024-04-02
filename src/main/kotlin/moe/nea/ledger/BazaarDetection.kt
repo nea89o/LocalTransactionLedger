@@ -6,9 +6,9 @@ import java.util.regex.Pattern
 class BazaarDetection(val ledger: LedgerLogger, val ids: ItemIdProvider) {
 
     val instaBuyPattern =
-        Pattern.compile("\\[Bazaar\\] Bought (?<count>[0-9]+)x (?<what>.*) for (?<coins>$SHORT_NUMBER_PATTERN) coins!")
+        Pattern.compile("\\[Bazaar\\] Bought (?<count>$SHORT_NUMBER_PATTERN)x (?<what>.*) for (?<coins>$SHORT_NUMBER_PATTERN) coins!")
     val instaSellPattern =
-        Pattern.compile("\\[Bazaar\\] Sold (?<count>[0-9]+)x (?<what>.*) for (?<coins>$SHORT_NUMBER_PATTERN) coins!")
+        Pattern.compile("\\[Bazaar\\] Sold (?<count>$SHORT_NUMBER_PATTERN)x (?<what>.*) for (?<coins>$SHORT_NUMBER_PATTERN) coins!")
 
 
     @SubscribeEvent
@@ -20,7 +20,7 @@ class BazaarDetection(val ledger: LedgerLogger, val ids: ItemIdProvider) {
                     event.timestamp,
                     parseShortNumber(group("coins")),
                     ids.findForName(group("what")),
-                    group("count").toInt(),
+                    parseShortNumber(group("count")).toInt(),
                 )
             )
         }
@@ -31,7 +31,7 @@ class BazaarDetection(val ledger: LedgerLogger, val ids: ItemIdProvider) {
                     event.timestamp,
                     parseShortNumber(group("coins")),
                     ids.findForName(group("what")),
-                    group("count").toInt(),
+                    parseShortNumber(group("count")).toInt(),
                 )
             )
         }

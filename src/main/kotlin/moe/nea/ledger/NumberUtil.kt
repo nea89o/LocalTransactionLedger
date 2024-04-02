@@ -27,7 +27,7 @@ fun parseShortNumber(string: String): Double {
     return k.toDouble() * scalarMultiplier
 }
 
-fun <T> Pattern.useMatcher(string: String, block: Matcher.() -> T): T? =
+inline fun <T> Pattern.useMatcher(string: String, block: Matcher.() -> T): T? =
     matcher(string).takeIf { it.matches() }?.let(block)
 
 fun String.unformattedString(): String = replace("§.".toRegex(), "")

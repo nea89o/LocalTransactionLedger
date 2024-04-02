@@ -1,11 +1,15 @@
 package moe.nea.ledger
 
+import net.minecraft.client.Minecraft
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.common.MinecraftForge
+import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.common.event.FMLInitializationEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import org.apache.logging.log4j.LogManager
 
 @Mod(modid = "ledger", useMetadata = true)
@@ -52,7 +56,30 @@ class Ledger {
             BazaarDetection(ledger, ids),
             BazaarOrderDetection(ledger, ids),
             AuctionHouseDetection(ledger, ids),
+            BitsDetection(ledger),
+            BitsShop(ledger),
         ).forEach(MinecraftForge.EVENT_BUS::register)
+    }
+
+    var lastJoin = -1L
+
+    @SubscribeEvent
+    fun worldSwitchEvent(event: EntityJoinWorldEvent) {
+        if (event.entity == Minecraft.getMinecraft().thePlayer) {
+            lastJoin = System.currentTimeMillis()
+        }
+    }
+
+    @SubscribeEvent
+    fun tickEvent(event: ClientTickEvent) {
+        if (event.phase == TickEvent.Phase.END
+            && lastJoin > 0
+            && System.currentTimeMillis() - lastJoin > 10_000
+            && Minecraft.getMinecraft().thePlayer != null
+        ) {
+            lastJoin = -1
+            MinecraftForge.EVENT_BUS.post(LateWorldLoadEvent())
+        }
     }
 
     @SubscribeEvent(receiveCanceled = true, priority = EventPriority.HIGHEST)

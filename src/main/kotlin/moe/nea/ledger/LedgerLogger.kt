@@ -60,6 +60,7 @@ class LedgerLogger {
     }
 
     fun logEntry(entry: LedgerEntry) {
+        printToChat(entry)
         Ledger.logger.info("Logging entry of type ${entry.transactionType}")
         entries.add(entry.intoJson())
         commit()
