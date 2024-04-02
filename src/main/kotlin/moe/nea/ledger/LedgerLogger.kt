@@ -17,6 +17,18 @@ class LedgerLogger {
         Minecraft.getMinecraft().ingameGUI?.chatGUI?.printChatMessage(ChatComponentText(text))
     }
 
+    val profileIdPattern =
+        "Profile ID: (?<profile>[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})".toPattern()
+
+    var currentProfile: String? = null
+
+    @SubscribeEvent
+    fun onProfileSwitch(event: ChatReceived) {
+        profileIdPattern.useMatcher(event.message) {
+            currentProfile = group("profile")
+        }
+    }
+
 
     fun printToChat(entry: LedgerEntry) {
         printOut(
@@ -27,6 +39,7 @@ class LedgerLogger {
             §eTOTAL VALUE: §a${entry.totalTransactionCoins}
             §eITEM ID: §a${entry.itemId}
             §eITEM AMOUNT: §a${entry.itemAmount}
+            §ePROFILE: §a${currentProfile}
             §e================= TRANSACTION END
             """.trimIndent()
         )
@@ -62,7 +75,7 @@ class LedgerLogger {
     fun logEntry(entry: LedgerEntry) {
         printToChat(entry)
         Ledger.logger.info("Logging entry of type ${entry.transactionType}")
-        entries.add(entry.intoJson())
+        entries.add(entry.intoJson(currentProfile))
         commit()
     }
 
@@ -101,13 +114,19 @@ data class LedgerEntry(
     val itemId: String? = null,
     val itemAmount: Int? = null,
 ) {
-    fun intoJson(): JsonObject {
+    fun intoJson(profileId: String?): JsonObject {
         return JsonObject().apply {
             addProperty("transactionType", transactionType)
             addProperty("timestamp", timestamp.toEpochMilli().toString())
             addProperty("totalTransactionValue", totalTransactionCoins)
             addProperty("itemId", itemId ?: "")
             addProperty("itemAmount", itemAmount ?: 0)
+            addProperty("profileId", profileId)
+            addProperty(
+                "playerId",
+                (Minecraft.getMinecraft().thePlayer?.uniqueID?.toString() ?: lastKnownUUID).also { lastKnownUUID = it })
         }
     }
 }
+
+var lastKnownUUID = "null"
