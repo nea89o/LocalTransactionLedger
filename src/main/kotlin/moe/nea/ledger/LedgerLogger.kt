@@ -73,7 +73,6 @@ class LedgerLogger {
     }
 
     fun logEntry(entry: LedgerEntry) {
-        printToChat(entry)
         Ledger.logger.info("Logging entry of type ${entry.transactionType}")
         entries.add(entry.intoJson(currentProfile))
         commit()
@@ -124,7 +123,8 @@ data class LedgerEntry(
             addProperty("profileId", profileId)
             addProperty(
                 "playerId",
-                (Minecraft.getMinecraft().thePlayer?.uniqueID?.toString() ?: lastKnownUUID).also { lastKnownUUID = it })
+                (Minecraft.getMinecraft().thePlayer?.uniqueID?.toString() ?: lastKnownUUID)
+                    .also { lastKnownUUID = it })
         }
     }
 }
