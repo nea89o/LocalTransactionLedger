@@ -19,3 +19,10 @@ fun ItemStack.getLore(): List<String> {
     return (0 until lore.tagCount()).map { lore.getStringTagAt(it) }
 }
 
+
+fun ItemStack.getDisplayNameU(): String {
+    val nbt = this.tagCompound ?: NBTTagCompound()
+    val extraAttributes = nbt.getCompoundTag("display")
+    return extraAttributes.getString("Name")
+}
+

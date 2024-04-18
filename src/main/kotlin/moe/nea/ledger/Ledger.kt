@@ -56,6 +56,7 @@ class Ledger {
             ledger,
             BankDetection(ledger),
             BazaarDetection(ledger, ids),
+            DungeonChestDetection(ledger),
             BazaarOrderDetection(ledger, ids),
             AuctionHouseDetection(ledger, ids),
             BitsDetection(ledger),
