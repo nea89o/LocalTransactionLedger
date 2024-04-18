@@ -17,7 +17,24 @@ class DungeonChestDetection(val logger: LedgerLogger) {
             }
         },
         Damage: 0s
-    }*/
+    }
+
+    {
+    id: "minecraft:feather",
+    Count: 1b,
+    tag: {
+        overrideMeta: 1b,
+        ench: [],
+        HideFlags: 254,
+        display: {
+            Lore: ["§7Consume a §9Kismet Feather §7to reroll", "§7the loot within this chest.", "", "§7You may only use a feather once", "§7per dungeon run.", "", "§eClick to reroll this chest!"],
+            Name: "§aReroll Chest"
+        },
+        AttributeModifiers: []
+    },
+    Damage: 0s
+}
+    */
     val costPattern = Pattern.compile("(?<cost>$SHORT_NUMBER_PATTERN) Coins")
 
 
@@ -30,7 +47,25 @@ class DungeonChestDetection(val logger: LedgerLogger) {
     var lastOpenedChest: ChestCost? = null
 
     @SubscribeEvent
-    fun onSlotClick(event: GuiClickEvent) {
+    fun onKismetClick(event: GuiClickEvent) {
+        val slot = event.slotIn ?: return
+        if (!slot.inventory.displayName.unformattedText.unformattedString().endsWith(" Chest")) return
+        val stack = slot.stack ?: return
+        if (stack.getDisplayNameU() == "§aReroll Chest") {
+            logger.logEntry(
+                LedgerEntry(
+                    "KISMET_REROLL",
+                    Instant.now(),
+                    0.0,
+                    itemId = "KISMET_FEATHER",
+                    itemAmount = 1
+                )
+            )
+        }
+    }
+
+    @SubscribeEvent
+    fun onRewardChestClick(event: GuiClickEvent) {
         val slot = event.slotIn ?: return
         if (!slot.inventory.displayName.unformattedText.unformattedString().endsWith(" Chest")) return
         val stack = slot.stack ?: return
