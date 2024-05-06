@@ -11,6 +11,8 @@ import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import java.io.File
+import java.sql.Connection
+import java.sql.DriverManager
 import java.text.SimpleDateFormat
 import java.time.Instant
 import java.util.*
@@ -19,6 +21,8 @@ class LedgerLogger {
     fun printOut(text: String) {
         Minecraft.getMinecraft().ingameGUI?.chatGUI?.printChatMessage(ChatComponentText(text))
     }
+
+    val connection = DriverManager.getConnection("jdbc:sqlite:money-ledger/database.db")
 
     val profileIdPattern =
         "Profile ID: (?<profile>[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})".toPattern()
