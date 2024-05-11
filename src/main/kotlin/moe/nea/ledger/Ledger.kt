@@ -3,6 +3,11 @@ package moe.nea.ledger
 import io.github.notenoughupdates.moulconfig.common.IMinecraft
 import io.github.notenoughupdates.moulconfig.managed.ManagedConfig
 import moe.nea.ledger.config.LedgerConfig
+import moe.nea.ledger.database.Column
+import moe.nea.ledger.database.DBInstant
+import moe.nea.ledger.database.DBString
+import moe.nea.ledger.database.Database
+import moe.nea.ledger.database.Table
 import net.minecraft.client.Minecraft
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
@@ -61,6 +66,8 @@ class Ledger {
 	@Mod.EventHandler
 	fun init(event: FMLInitializationEvent) {
 		logger.info("Initializing ledger")
+		Database.init()
+
 		ClientCommandHandler.instance.registerCommand(object : CommandBase() {
 			override fun canCommandSenderUseCommand(sender: ICommandSender?): Boolean {
 				return true

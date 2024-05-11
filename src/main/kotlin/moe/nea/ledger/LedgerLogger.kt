@@ -22,8 +22,6 @@ class LedgerLogger {
         Minecraft.getMinecraft().ingameGUI?.chatGUI?.printChatMessage(ChatComponentText(text))
     }
 
-    val connection = DriverManager.getConnection("jdbc:sqlite:money-ledger/database.db")
-
     val profileIdPattern =
         "Profile ID: (?<profile>[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})".toPattern()
 
