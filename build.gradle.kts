@@ -6,7 +6,7 @@ plugins {
 	id("gg.essential.loom") version "0.10.0.+"
 	id("dev.architectury.architectury-pack200") version "0.1.3"
 	id("com.github.johnrengelman.shadow") version "8.1.1"
-	kotlin("jvm") version "1.8.21"
+	kotlin("jvm") version "2.0.20"
 }
 
 val baseGroup: String by project
@@ -84,9 +84,14 @@ dependencies {
 	shadowImpl("org.xerial:sqlite-jdbc:3.45.3.0")
 	shadowImpl("org.notenoughupdates.moulconfig:legacy:3.0.0-beta.9")
 	runtimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.1.2")
+	testImplementation("org.junit.jupiter:junit-jupiter:5.9.2")
 }
 
 // Tasks:
+
+tasks.test {
+	useJUnitPlatform()
+}
 
 tasks.withType(JavaCompile::class) {
 	options.encoding = "UTF-8"

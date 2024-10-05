@@ -106,6 +106,7 @@ class Ledger {
 			AuctionHouseDetection(ledger, ids),
 			BitsDetection(ledger),
 			BitsShop(ledger),
+			MinionDetection(ledger),
 		).forEach(MinecraftForge.EVENT_BUS::register)
 	}
 
