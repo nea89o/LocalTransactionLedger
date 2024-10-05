@@ -3,6 +3,7 @@ package moe.nea.ledger.database
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.ResultSet
+import java.sql.Timestamp
 import java.time.Instant
 
 interface DBSchema {
@@ -122,9 +123,40 @@ abstract class Table(val name: String) {
 			.execute()
 	}
 
+	enum class OnConflict {
+		FAIL,
+		IGNORE,
+		REPLACE,
+		;
+
+		fun asSql(): String {
+			return name
+		}
+	}
+
+	fun insert(connection: Connection, onConflict: OnConflict = OnConflict.FAIL, block: (InsertStatement) -> Unit) {
+		val insert = InsertStatement(HashMap())
+		block(insert)
+		require(insert.properties.keys == columns.toSet())
+		val columnNames = columns.joinToString { it.sqlName }
+		val valueNames = columns.joinToString { "?" }
+		val statement =
+			connection.prepareAndLog("INSERT OR ${onConflict.asSql()} INTO $sqlName ($columnNames) VALUES ($valueNames)")
+		for ((index, column) in columns.withIndex()) {
+			(column as Column<Any>).type.set(statement, index + 1, insert.properties[column]!!)
+		}
+		statement.execute()
+	}
+
 
 	fun selectAll(connection: Connection): Query {
 		return Query(connection, columns, this)
+	}
+}
+
+class InsertStatement(val properties: MutableMap<Column<*>, Any>) {
+	operator fun <T : Any> set(key: Column<T>, value: T) {
+		properties[key] = value
 	}
 }
 
@@ -162,7 +194,7 @@ class Query(
 				query += "OFFSET $skip "
 			}
 		}
-		val prepared = connection.prepareAndLog(query)
+		val prepared = connection.prepareAndLog(query.trim())
 		val results = prepared.executeQuery()
 		return object : Iterator<ResultRow> {
 			var hasAdvanced = false

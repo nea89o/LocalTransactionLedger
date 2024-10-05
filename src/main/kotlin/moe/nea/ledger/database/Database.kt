@@ -17,7 +17,12 @@ object Database {
 	fun init() {
 		MetaTable.createIfNotExists(connection)
 		val meta = MetaTable.selectAll(connection).associate { it[MetaTable.key] to it[MetaTable.value] }
-		println("Old Meta: $meta")
+		val lastLaunch = meta["lastLaunch"]?.toLong() ?: 0L
+		println("Last launch $lastLaunch")
+		MetaTable.insert(connection, Table.OnConflict.REPLACE) {
+			it[MetaTable.key] = "lastLaunch"
+			it[MetaTable.value] = System.currentTimeMillis().toString()
+		}
 	}
 
 }
