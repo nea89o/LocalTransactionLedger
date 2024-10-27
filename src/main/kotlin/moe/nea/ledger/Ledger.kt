@@ -3,11 +3,7 @@ package moe.nea.ledger
 import io.github.notenoughupdates.moulconfig.common.IMinecraft
 import io.github.notenoughupdates.moulconfig.managed.ManagedConfig
 import moe.nea.ledger.config.LedgerConfig
-import moe.nea.ledger.database.Column
-import moe.nea.ledger.database.DBInstant
-import moe.nea.ledger.database.DBString
 import moe.nea.ledger.database.Database
-import moe.nea.ledger.database.Table
 import net.minecraft.client.Minecraft
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
@@ -53,6 +49,7 @@ class Ledger {
 	TODO: TRADING, FORGE, COOKIE_EATEN, NPC_SELL, NPC_BUY
 	*/
 	companion object {
+		val dataFolder = File("money-ledger").apply { mkdirs() }
 		val logger = LogManager.getLogger("MoneyLedger")
 		val managedConfig = ManagedConfig.create(File("config/money-ledger/config.json"), LedgerConfig::class.java) {
 			checkExpose = false

@@ -1,9 +1,10 @@
 package moe.nea.ledger.database
 
+import moe.nea.ledger.Ledger
 import java.sql.DriverManager
 
 object Database {
-	val connection = DriverManager.getConnection("jdbc:sqlite:money-ledger/database.db")
+	val connection = DriverManager.getConnection("jdbc:sqlite:${Ledger.dataFolder.resolve("database.db")}")
 
 	object MetaTable : Table("LedgerMeta") {
 		val key = column("key", DBString)

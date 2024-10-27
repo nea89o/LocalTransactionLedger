@@ -119,7 +119,7 @@ class LedgerLogger {
 
     val gson = Gson()
 
-    val folder = File("money-ledger").also { it.mkdirs() }
+    val folder = Ledger.dataFolder
     val file: File = run {
         val date = SimpleDateFormat("yyyy.MM.dd").format(Date())
 
