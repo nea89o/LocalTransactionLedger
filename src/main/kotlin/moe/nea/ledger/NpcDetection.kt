@@ -6,9 +6,9 @@ import java.util.regex.Pattern
 class NpcDetection(val ledger: LedgerLogger, val ids: ItemIdProvider) {
 
     val npcBuyPattern =
-        Pattern.compile("You bought (?<what>.*?) x(?<count>$SHORT_NUMBER_PATTERN) for (?<coins>$SHORT_NUMBER_PATTERN) Coins!")
+        Pattern.compile("You bought (?<what>.*?) (x(?<count>$SHORT_NUMBER_PATTERN) )?for (?<coins>$SHORT_NUMBER_PATTERN) Coins!")
     val npcSellPattern =
-        Pattern.compile("You sold (?<what>.*) x(?<count>$SHORT_NUMBER_PATTERN) for (?<coins>$SHORT_NUMBER_PATTERN) Coins!")
+        Pattern.compile("You sold (?<what>.*) (x(?<count>$SHORT_NUMBER_PATTERN) )?for (?<coins>$SHORT_NUMBER_PATTERN) Coins!")
 
     @SubscribeEvent
     fun onNpcBuy(event: ChatReceived) {
@@ -19,7 +19,7 @@ class NpcDetection(val ledger: LedgerLogger, val ids: ItemIdProvider) {
                     event.timestamp,
                     parseShortNumber(group("coins")),
                     ids.findForName(group("what")),
-                    parseShortNumber(group("count")).toInt(),
+                    group("count")?.let(::parseShortNumber)?.toInt() ?: 1,
                 )
             )
         }
@@ -30,7 +30,7 @@ class NpcDetection(val ledger: LedgerLogger, val ids: ItemIdProvider) {
                     event.timestamp,
                     parseShortNumber(group("coins")),
                     ids.findForName(group("what")),
-                    parseShortNumber(group("count")).toInt(),
+                    group("count")?.let(::parseShortNumber)?.toInt() ?: 1,
                 )
             )
         }
