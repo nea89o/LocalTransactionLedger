@@ -10,10 +10,6 @@ class NpcDetection(val ledger: LedgerLogger, val ids: ItemIdProvider) {
     val npcSellPattern =
         Pattern.compile("You sold (?<what>.*) x(?<count>$SHORT_NUMBER_PATTERN) for (?<coins>$SHORT_NUMBER_PATTERN) Coins!")
 
-    // You bought Cactus x32 for 465.6 Coins!
-    // You sold Cactus x1 for 3 Coins!
-
-
     @SubscribeEvent
     fun onNpcBuy(event: ChatReceived) {
         npcBuyPattern.useMatcher(event.message) {
