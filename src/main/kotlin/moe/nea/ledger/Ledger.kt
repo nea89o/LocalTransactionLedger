@@ -46,7 +46,12 @@ class Ledger {
 	You purchased 2x Walnut for 69 coins!
 	You purchased ◆ Ice Rune I for 4,000 coins!
 
-	TODO: TRADING, FORGE, COOKIE_EATEN, NPC_SELL, NPC_BUY
+	// NPC
+
+	// You bought Cactus x32 for 465.6 Coins!
+	// You sold Cactus x1 for 3 Coins!
+
+	TODO: TRADING, FORGE, COOKIE_EATEN
 	*/
 	companion object {
 		val dataFolder = File("money-ledger").apply { mkdirs() }
@@ -104,6 +109,7 @@ class Ledger {
 			BitsDetection(ledger),
 			BitsShop(ledger),
 			MinionDetection(ledger),
+			NpcDetection(ledger, ids),
 		).forEach(MinecraftForge.EVENT_BUS::register)
 	}
 
