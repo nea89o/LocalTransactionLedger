@@ -50,6 +50,7 @@ class Ledger {
 
 	// You bought Cactus x32 for 465.6 Coins!
 	// You sold Cactus x1 for 3 Coins!
+	// You bought back Potato x3 for 9 Coins!
 
 	TODO: TRADING, FORGE, COOKIE_EATEN
 	*/

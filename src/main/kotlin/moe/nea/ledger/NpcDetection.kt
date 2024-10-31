@@ -6,7 +6,7 @@ import java.util.regex.Pattern
 class NpcDetection(val ledger: LedgerLogger, val ids: ItemIdProvider) {
 
     val npcBuyPattern =
-        Pattern.compile("You bought (?<what>.*?) (x(?<count>$SHORT_NUMBER_PATTERN) )?for (?<coins>$SHORT_NUMBER_PATTERN) Coins!")
+        Pattern.compile("You bought (back )?(?<what>.*?) (x(?<count>$SHORT_NUMBER_PATTERN) )?for (?<coins>$SHORT_NUMBER_PATTERN) Coins!")
     val npcSellPattern =
         Pattern.compile("You sold (?<what>.*) (x(?<count>$SHORT_NUMBER_PATTERN) )?for (?<coins>$SHORT_NUMBER_PATTERN) Coins!")
 
