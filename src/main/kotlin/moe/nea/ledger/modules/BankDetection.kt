@@ -1,8 +1,11 @@
 package moe.nea.ledger.modules
 
+import moe.nea.ledger.ItemChange
+import moe.nea.ledger.ItemId
 import moe.nea.ledger.LedgerEntry
 import moe.nea.ledger.LedgerLogger
 import moe.nea.ledger.SHORT_NUMBER_PATTERN
+import moe.nea.ledger.TransactionType
 import moe.nea.ledger.events.ChatReceived
 import moe.nea.ledger.parseShortNumber
 import moe.nea.ledger.useMatcher
@@ -22,18 +25,22 @@ class BankDetection @Inject constructor(val ledger: LedgerLogger) {
 		withdrawPattern.useMatcher(event.message) {
 			ledger.logEntry(
 				LedgerEntry(
-					"BANK_WITHDRAW",
+					TransactionType.BANK_WITHDRAW,
 					event.timestamp,
-					parseShortNumber(group("amount")),
+					listOf(ItemChange(ItemId.COINS,
+					                  parseShortNumber(group("amount")),
+					                  ItemChange.ChangeDirection.TRANSFORM)),
 				)
 			)
 		}
 		depositPattern.useMatcher(event.message) {
 			ledger.logEntry(
 				LedgerEntry(
-					"BANK_DEPOSIT",
+					TransactionType.BANK_DEPOSIT,
 					event.timestamp,
-					parseShortNumber(group("amount")),
+					listOf(ItemChange(ItemId.COINS,
+					                  parseShortNumber(group("amount")),
+					                  ItemChange.ChangeDirection.TRANSFORM)),
 				)
 			)
 		}

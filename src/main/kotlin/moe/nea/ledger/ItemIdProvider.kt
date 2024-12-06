@@ -22,7 +22,7 @@ class ItemIdProvider {
 		MinecraftForge.EVENT_BUS.post(BeforeGuiAction(event.gui))
 	}
 
-	private val knownNames = mutableMapOf<String, String>()
+	private val knownNames = mutableMapOf<String, ItemId>()
 
 	@SubscribeEvent
 	fun saveInventoryIds(event: BeforeGuiAction) {
@@ -45,7 +45,7 @@ class ItemIdProvider {
 		}
 	}
 
-	fun findForName(name: String): String? {
+	fun findForName(name: String): ItemId? {
 		return knownNames[name]
 	}
 

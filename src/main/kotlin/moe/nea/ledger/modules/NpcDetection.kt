@@ -1,10 +1,13 @@
 package moe.nea.ledger.modules
 
-import moe.nea.ledger.events.ChatReceived
+import moe.nea.ledger.ItemChange
+import moe.nea.ledger.ItemId
 import moe.nea.ledger.ItemIdProvider
 import moe.nea.ledger.LedgerEntry
 import moe.nea.ledger.LedgerLogger
 import moe.nea.ledger.SHORT_NUMBER_PATTERN
+import moe.nea.ledger.TransactionType
+import moe.nea.ledger.events.ChatReceived
 import moe.nea.ledger.parseShortNumber
 import moe.nea.ledger.useMatcher
 import moe.nea.ledger.utils.Inject
@@ -23,22 +26,32 @@ class NpcDetection @Inject constructor(val ledger: LedgerLogger, val ids: ItemId
 		npcBuyPattern.useMatcher(event.message) {
 			ledger.logEntry(
 				LedgerEntry(
-					"NPC_BUY",
+					TransactionType.NPC_BUY,
 					event.timestamp,
-					parseShortNumber(group("coins")),
-					ids.findForName(group("what")),
-					group("count")?.let(::parseShortNumber)?.toInt() ?: 1,
+					listOf(
+						ItemChange.loseCoins(
+							parseShortNumber(group("coins")),
+						),
+						ItemChange.gain(
+							ids.findForName(group("what")) ?: ItemId.NIL,
+							group("count")?.let(::parseShortNumber) ?: 1,
+						)
+					)
 				)
 			)
 		}
 		npcSellPattern.useMatcher(event.message) {
 			ledger.logEntry(
 				LedgerEntry(
-					"NPC_SELL",
+					TransactionType.NPC_SELL,
 					event.timestamp,
-					parseShortNumber(group("coins")),
-					ids.findForName(group("what")),
-					group("count")?.let(::parseShortNumber)?.toInt() ?: 1,
+					listOf(
+						ItemChange.gainCoins(parseShortNumber(group("coins"))),
+						ItemChange.lose(
+							ids.findForName(group("what")) ?: ItemId.NIL,
+							group("count")?.let(::parseShortNumber)?.toInt() ?: 1,
+						)
+					)
 				)
 			)
 		}

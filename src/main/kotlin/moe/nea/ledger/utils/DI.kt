@@ -31,6 +31,8 @@ class DI {
 		return internalProvide<T, Any>(type, element)
 	}
 
+	inline fun <reified T : Any> provide(): T = provide(T::class.java)
+
 	fun <T : Any> register(type: Class<T>, provider: BaseDIProvider<T, *>) {
 		providers[type] = provider
 	}

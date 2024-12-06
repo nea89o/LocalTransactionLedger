@@ -83,6 +83,7 @@ dependencies {
 
 	shadowImpl("org.xerial:sqlite-jdbc:3.45.3.0")
 	shadowImpl("org.notenoughupdates.moulconfig:legacy:3.0.0-beta.9")
+	shadowImpl("io.azam.ulidj:ulidj:1.0.4")
 	runtimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.1.2")
 	testImplementation("org.junit.jupiter:junit-jupiter:5.9.2")
 }

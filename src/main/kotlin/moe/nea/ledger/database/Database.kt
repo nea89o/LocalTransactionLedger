@@ -1,10 +1,11 @@
 package moe.nea.ledger.database
 
 import moe.nea.ledger.Ledger
+import java.sql.Connection
 import java.sql.DriverManager
 
-object Database {
-	val connection = DriverManager.getConnection("jdbc:sqlite:${Ledger.dataFolder.resolve("database.db")}")
+class Database {
+	lateinit var connection: Connection
 
 	object MetaTable : Table("LedgerMeta") {
 		val key = column("key", DBString)
@@ -15,14 +16,38 @@ object Database {
 		}
 	}
 
-	fun init() {
-		MetaTable.createIfNotExists(connection)
-		val meta = MetaTable.selectAll(connection).associate { it[MetaTable.key] to it[MetaTable.value] }
-		val lastLaunch = meta["lastLaunch"]?.toLong() ?: 0L
-		println("Last launch $lastLaunch")
+	data class MetaKey(val name: String) {
+		companion object {
+			val DATABASE_VERSION = MetaKey("databaseVersion")
+			val LAST_LAUNCH = MetaKey("lastLaunch")
+		}
+	}
+
+	fun setMetaKey(key: MetaKey, value: String) {
 		MetaTable.insert(connection, Table.OnConflict.REPLACE) {
-			it[MetaTable.key] = "lastLaunch"
-			it[MetaTable.value] = System.currentTimeMillis().toString()
+			it[MetaTable.key] = key.name
+			it[MetaTable.value] = value
+		}
+	}
+
+	val databaseVersion: Long = 1
+
+	fun loadAndUpgrade() {
+		connection = DriverManager.getConnection("jdbc:sqlite:${Ledger.dataFolder.resolve("database.db")}")
+		MetaTable.createIfNotExists(connection)
+		val meta = MetaTable.selectAll(connection).associate { MetaKey(it[MetaTable.key]) to it[MetaTable.value] }
+		val lastLaunch = meta[MetaKey.LAST_LAUNCH]?.toLong() ?: 0L
+		println("Last launch $lastLaunch")
+		setMetaKey(MetaKey.LAST_LAUNCH, System.currentTimeMillis().toString())
+
+		val oldVersion = meta[MetaKey.DATABASE_VERSION]?.toLong() ?: -1
+		println("Old Database Version: $oldVersion; Current version: $databaseVersion")
+		// TODO: create a backup if there is a db version upgrade happening
+		DBUpgrade.performUpgradeChain(
+			connection, oldVersion, databaseVersion,
+			Upgrades().upgrades
+		) { version ->
+			setMetaKey(MetaKey.DATABASE_VERSION, version.toString())
 		}
 	}
 

@@ -1,0 +1,23 @@
+digraph {
+    node [shape=plain];
+    rankdir=LR;
+    entry [label=<
+        <table border="0" cellborder="1" cellspacing="0">
+            <tr><td>Log Entry</td></tr>
+            <tr><td port="player">playerId</td></tr>
+            <tr><td port="profile">profileId</td></tr>
+            <tr><td port="date">timestamp</td></tr>
+            <tr><td port="type">Type</td></tr>
+        </table>
+    >];
+    item [label=<
+        <table border="0" cellborder="1" cellspacing="0">
+            <tr><td>Item Stack</td><tr>
+            <tr><td port="transaction">Transaction</td></tr>
+            <tr><td port="id">Item ID</td></tr>
+            <tr><td port="count">Count</td></tr>
+            <tr><td port="direction">Transfer Direction</td></tr>
+        </table>
+    >];
+//    item:transaction -> entry;
+}

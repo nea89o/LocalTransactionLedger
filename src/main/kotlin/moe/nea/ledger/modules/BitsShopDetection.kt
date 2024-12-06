@@ -1,10 +1,13 @@
 package moe.nea.ledger.modules
 
+import moe.nea.ledger.ItemChange
+import moe.nea.ledger.ItemId
 import moe.nea.ledger.events.ChatReceived
 import moe.nea.ledger.events.GuiClickEvent
 import moe.nea.ledger.LedgerEntry
 import moe.nea.ledger.LedgerLogger
 import moe.nea.ledger.SHORT_NUMBER_PATTERN
+import moe.nea.ledger.TransactionType
 import moe.nea.ledger.getInternalId
 import moe.nea.ledger.getLore
 import moe.nea.ledger.parseShortNumber
@@ -18,7 +21,8 @@ class BitsShopDetection @Inject constructor(val ledger: LedgerLogger) {
 
 
     data class BitShopEntry(
-        val id: String,
+        val id: ItemId,
+        val stackSize: Int,
         val bitPrice: Int,
         val timestamp: Long = System.currentTimeMillis()
     )
@@ -37,7 +41,7 @@ class BitsShopDetection @Inject constructor(val ledger: LedgerLogger) {
         val bitPrice = stack.getLore()
             .firstNotNullOfOrNull { bitCostPattern.useMatcher(it.unformattedString()) { parseShortNumber(group("cost")).toInt() } }
             ?: return
-        lastClickedBitShopItem = BitShopEntry(id, bitPrice)
+        lastClickedBitShopItem = BitShopEntry(id, stack.stackSize, bitPrice)
     }
 
     @SubscribeEvent
@@ -47,10 +51,12 @@ class BitsShopDetection @Inject constructor(val ledger: LedgerLogger) {
             if (System.currentTimeMillis() - lastBit.timestamp > 5000) return
             ledger.logEntry(
                 LedgerEntry(
-                    "COMMUNITY_SHOP_BUY", Instant.now(),
-                    lastBit.bitPrice.toDouble(),
-                    lastBit.id,
-                    1
+	                TransactionType.COMMUNITY_SHOP_BUY,
+	                Instant.now(),
+	                listOf(
+						ItemChange.lose(ItemId.BITS, lastBit.bitPrice.toDouble()),
+						ItemChange.gain(lastBit.id, lastBit.stackSize)
+					)
                 )
             )
         }

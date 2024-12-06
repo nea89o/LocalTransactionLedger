@@ -79,7 +79,6 @@ class Ledger {
 	@Mod.EventHandler
 	fun init(event: FMLInitializationEvent) {
 		logger.info("Initializing ledger")
-		Database.init()
 
 		val di = DI()
 		di.registerSingleton(this)
@@ -97,11 +96,14 @@ class Ledger {
 			NpcDetection::class.java,
 			LogChatCommand::class.java,
 			ConfigCommand::class.java,
+			Database::class.java
 		)
 		di.instantiateAll()
 		di.getAllInstances().forEach(MinecraftForge.EVENT_BUS::register)
 		di.getAllInstances().filterIsInstance<ICommand>()
 			.forEach { ClientCommandHandler.instance.registerCommand(it) }
+
+		di.provide<Database>().loadAndUpgrade()
 	}
 
 	var lastJoin = -1L
