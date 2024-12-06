@@ -22,6 +22,10 @@ class LedgerConfig : Config() {
 
 	@Category(name = "Synchronization", desc = "")
 	@JvmField
-	val synchronization = Synchronization()
+	val synchronization = SynchronizationOptions()
+
+	@Category(name = "Debug", desc = "")
+	@JvmField
+	val debug = DebugOptions()
 
 }

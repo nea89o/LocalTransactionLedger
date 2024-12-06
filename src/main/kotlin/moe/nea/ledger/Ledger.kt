@@ -1,6 +1,5 @@
 package moe.nea.ledger
 
-import io.github.notenoughupdates.moulconfig.common.IMinecraft
 import io.github.notenoughupdates.moulconfig.managed.ManagedConfig
 import moe.nea.ledger.config.LedgerConfig
 import moe.nea.ledger.database.Database
@@ -17,8 +16,7 @@ import moe.nea.ledger.modules.MinionDetection
 import moe.nea.ledger.modules.NpcDetection
 import moe.nea.ledger.utils.DI
 import net.minecraft.client.Minecraft
-import net.minecraft.command.CommandBase
-import net.minecraft.command.ICommandSender
+import net.minecraft.command.ICommand
 import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.common.MinecraftForge
@@ -83,31 +81,6 @@ class Ledger {
 		logger.info("Initializing ledger")
 		Database.init()
 
-		ClientCommandHandler.instance.registerCommand(object : CommandBase() {
-			override fun canCommandSenderUseCommand(sender: ICommandSender?): Boolean {
-				return true
-			}
-
-			override fun getCommandName(): String {
-				return "ledger"
-			}
-
-			override fun getCommandUsage(sender: ICommandSender?): String {
-				return ""
-			}
-
-			override fun processCommand(sender: ICommandSender?, args: Array<out String>) {
-				val editor = managedConfig.getEditor()
-				editor.search(args.joinToString(" "))
-				runLater {
-					IMinecraft.instance.openWrappedScreen(editor)
-				}
-			}
-
-			override fun getCommandAliases(): List<String> {
-				return listOf("moneyledger")
-			}
-		})
 		val di = DI()
 		di.registerSingleton(this)
 		di.registerInjectableClasses(
@@ -122,9 +95,13 @@ class Ledger {
 			BitsShopDetection::class.java,
 			MinionDetection::class.java,
 			NpcDetection::class.java,
+			LogChatCommand::class.java,
+			ConfigCommand::class.java,
 		)
 		di.instantiateAll()
 		di.getAllInstances().forEach(MinecraftForge.EVENT_BUS::register)
+		di.getAllInstances().filterIsInstance<ICommand>()
+			.forEach { ClientCommandHandler.instance.registerCommand(it) }
 	}
 
 	var lastJoin = -1L

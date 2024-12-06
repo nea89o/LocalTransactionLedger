@@ -30,9 +30,7 @@ fun interface DIProvider<T : Any> : BaseDIProvider<T, Unit> {
 				}.toTypedArray()
 				val instance = cons.newInstance(*typArgs)
 				for (it in clazz.fields) {
-					if (it.getAnnotation(Inject::class.java) != null) {
-						continue
-					}
+					if (it.getAnnotation(Inject::class.java) == null) continue
 					it.set(instance, di.provide(it.type, it))
 				}
 				instance
