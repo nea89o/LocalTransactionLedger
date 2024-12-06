@@ -1,6 +1,6 @@
 package moe.nea.ledger.mixin;
 
-import moe.nea.ledger.GuiClickEvent;
+import moe.nea.ledger.events.GuiClickEvent;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.inventory.Slot;
 import net.minecraftforge.common.MinecraftForge;

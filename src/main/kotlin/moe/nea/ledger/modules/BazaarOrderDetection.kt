@@ -1,12 +1,20 @@
-package moe.nea.ledger
+package moe.nea.ledger.modules
 
+import moe.nea.ledger.events.ChatReceived
+import moe.nea.ledger.ItemIdProvider
+import moe.nea.ledger.LedgerEntry
+import moe.nea.ledger.LedgerLogger
+import moe.nea.ledger.SHORT_NUMBER_PATTERN
 import moe.nea.ledger.mixin.AccessorGuiEditSign
+import moe.nea.ledger.parseShortNumber
+import moe.nea.ledger.useMatcher
+import moe.nea.ledger.utils.Inject
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 
-class BazaarOrderDetection(val ledger: LedgerLogger, val ids: ItemIdProvider) {
+class BazaarOrderDetection @Inject constructor(val ledger: LedgerLogger, val ids: ItemIdProvider) {
 
     val buyOrderClaimed =
         Pattern.compile("\\[Bazaar] Claimed (?<amount>$SHORT_NUMBER_PATTERN)x (?<what>.*) worth (?<coins>$SHORT_NUMBER_PATTERN) coins? bought for $SHORT_NUMBER_PATTERN each!")
@@ -47,22 +55,22 @@ class BazaarOrderDetection(val ledger: LedgerLogger, val ids: ItemIdProvider) {
         buyOrderClaimed.useMatcher(event.message) {
             ledger.logEntry(
                 LedgerEntry(
-                    "BAZAAR_BUY_ORDER",
-                    event.timestamp,
-                    parseShortNumber(group("coins")),
-                    ids.findForName(group("what")),
-                    parseShortNumber(group("amount")).toInt(),
+	                "BAZAAR_BUY_ORDER",
+	                event.timestamp,
+	                parseShortNumber(group("coins")),
+	                ids.findForName(group("what")),
+	                parseShortNumber(group("amount")).toInt(),
                 )
             )
         }
         sellOrderClaimed.useMatcher(event.message) {
             ledger.logEntry(
                 LedgerEntry(
-                    "BAZAAR_SELL_ORDER",
-                    event.timestamp,
-                    parseShortNumber(group("coins")),
-                    ids.findForName(group("what")),
-                    parseShortNumber(group("amount")).toInt(),
+	                "BAZAAR_SELL_ORDER",
+	                event.timestamp,
+	                parseShortNumber(group("coins")),
+	                ids.findForName(group("what")),
+	                parseShortNumber(group("amount")).toInt(),
                 )
             )
         }

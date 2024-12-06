@@ -4,6 +4,18 @@ import io.github.notenoughupdates.moulconfig.common.IMinecraft
 import io.github.notenoughupdates.moulconfig.managed.ManagedConfig
 import moe.nea.ledger.config.LedgerConfig
 import moe.nea.ledger.database.Database
+import moe.nea.ledger.events.ChatReceived
+import moe.nea.ledger.events.LateWorldLoadEvent
+import moe.nea.ledger.modules.AuctionHouseDetection
+import moe.nea.ledger.modules.BankDetection
+import moe.nea.ledger.modules.BazaarDetection
+import moe.nea.ledger.modules.BazaarOrderDetection
+import moe.nea.ledger.modules.BitsDetection
+import moe.nea.ledger.modules.BitsShopDetection
+import moe.nea.ledger.modules.DungeonChestDetection
+import moe.nea.ledger.modules.MinionDetection
+import moe.nea.ledger.modules.NpcDetection
+import moe.nea.ledger.utils.DI
 import net.minecraft.client.Minecraft
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
@@ -96,22 +108,23 @@ class Ledger {
 				return listOf("moneyledger")
 			}
 		})
-		val ledger = LedgerLogger()
-		val ids = ItemIdProvider()
-		listOf(
-			this,
-			ids,
-			ledger,
-			BankDetection(ledger),
-			BazaarDetection(ledger, ids),
-			DungeonChestDetection(ledger),
-			BazaarOrderDetection(ledger, ids),
-			AuctionHouseDetection(ledger, ids),
-			BitsDetection(ledger),
-			BitsShop(ledger),
-			MinionDetection(ledger),
-			NpcDetection(ledger, ids),
-		).forEach(MinecraftForge.EVENT_BUS::register)
+		val di = DI()
+		di.registerSingleton(this)
+		di.registerInjectableClasses(
+			LedgerLogger::class.java,
+			ItemIdProvider::class.java,
+			BankDetection::class.java,
+			BazaarDetection::class.java,
+			DungeonChestDetection::class.java,
+			BazaarOrderDetection::class.java,
+			AuctionHouseDetection::class.java,
+			BitsDetection::class.java,
+			BitsShopDetection::class.java,
+			MinionDetection::class.java,
+			NpcDetection::class.java,
+		)
+		di.instantiateAll()
+		di.getAllInstances().forEach(MinecraftForge.EVENT_BUS::register)
 	}
 
 	var lastJoin = -1L

@@ -3,6 +3,7 @@ package moe.nea.ledger
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import moe.nea.ledger.events.ChatReceived
 import net.minecraft.client.Minecraft
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
@@ -11,8 +12,6 @@ import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import java.io.File
-import java.sql.Connection
-import java.sql.DriverManager
 import java.text.SimpleDateFormat
 import java.time.Instant
 import java.util.*

@@ -1,5 +1,6 @@
-package moe.nea.ledger
+package moe.nea.ledger.events
 
+import moe.nea.ledger.unformattedString
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.fml.common.eventhandler.Event
 import java.time.Instant

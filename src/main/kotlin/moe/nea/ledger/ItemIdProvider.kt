@@ -1,5 +1,6 @@
 package moe.nea.ledger
 
+import moe.nea.ledger.events.BeforeGuiAction
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.nbt.NBTTagCompound

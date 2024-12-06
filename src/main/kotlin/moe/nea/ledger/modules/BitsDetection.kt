@@ -1,9 +1,19 @@
-package moe.nea.ledger
+package moe.nea.ledger.modules
 
+import moe.nea.ledger.events.ChatReceived
+import moe.nea.ledger.events.LateWorldLoadEvent
+import moe.nea.ledger.LedgerEntry
+import moe.nea.ledger.LedgerLogger
+import moe.nea.ledger.SHORT_NUMBER_PATTERN
+import moe.nea.ledger.ScoreboardUtil
+import moe.nea.ledger.parseShortNumber
+import moe.nea.ledger.unformattedString
+import moe.nea.ledger.useMatcher
+import moe.nea.ledger.utils.Inject
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.time.Instant
 
-class BitsDetection(val ledger: LedgerLogger) {
+class BitsDetection @Inject constructor(val ledger: LedgerLogger) {
 
     var lastBits = -1
 

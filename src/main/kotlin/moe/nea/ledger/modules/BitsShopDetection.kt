@@ -1,9 +1,20 @@
-package moe.nea.ledger
+package moe.nea.ledger.modules
 
+import moe.nea.ledger.events.ChatReceived
+import moe.nea.ledger.events.GuiClickEvent
+import moe.nea.ledger.LedgerEntry
+import moe.nea.ledger.LedgerLogger
+import moe.nea.ledger.SHORT_NUMBER_PATTERN
+import moe.nea.ledger.getInternalId
+import moe.nea.ledger.getLore
+import moe.nea.ledger.parseShortNumber
+import moe.nea.ledger.unformattedString
+import moe.nea.ledger.useMatcher
+import moe.nea.ledger.utils.Inject
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.time.Instant
 
-class BitsShop(val ledger: LedgerLogger) {
+class BitsShopDetection @Inject constructor(val ledger: LedgerLogger) {
 
 
     data class BitShopEntry(

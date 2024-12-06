@@ -1,11 +1,23 @@
-package moe.nea.ledger
+package moe.nea.ledger.modules
 
+import moe.nea.ledger.events.BeforeGuiAction
+import moe.nea.ledger.events.ChatReceived
+import moe.nea.ledger.ItemIdProvider
+import moe.nea.ledger.LedgerEntry
+import moe.nea.ledger.LedgerLogger
+import moe.nea.ledger.SHORT_NUMBER_PATTERN
+import moe.nea.ledger.getInternalId
+import moe.nea.ledger.getLore
+import moe.nea.ledger.parseShortNumber
+import moe.nea.ledger.unformattedString
+import moe.nea.ledger.useMatcher
+import moe.nea.ledger.utils.Inject
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 
-class AuctionHouseDetection(val ledger: LedgerLogger, val ids: ItemIdProvider) {
+class AuctionHouseDetection @Inject constructor(val ledger: LedgerLogger, val ids: ItemIdProvider) {
     data class LastViewedItem(
         val count: Int,
         val id: String,
@@ -28,24 +40,24 @@ class AuctionHouseDetection(val ledger: LedgerLogger, val ids: ItemIdProvider) {
         collectSold.useMatcher(event.message) {
             val lastViewedItem = lastViewedItems.removeLastOrNull()
             ledger.logEntry(
-                LedgerEntry(
-                    "AUCTION_SOLD",
-                    event.timestamp,
-                    parseShortNumber(group("coins")),
-                    lastViewedItem?.id,
-                    lastViewedItem?.count
-                )
+	            LedgerEntry(
+		            "AUCTION_SOLD",
+		            event.timestamp,
+		            parseShortNumber(group("coins")),
+		            lastViewedItem?.id,
+		            lastViewedItem?.count
+	            )
             )
         }
         purchased.useMatcher(event.message) {
             ledger.logEntry(
-                LedgerEntry(
-                    "AUCTION_BOUGHT",
-                    event.timestamp,
-                    parseShortNumber(group("coins")),
-                    ids.findForName(group("what")),
-                    group("amount")?.toInt() ?: 1
-                )
+	            LedgerEntry(
+		            "AUCTION_BOUGHT",
+		            event.timestamp,
+		            parseShortNumber(group("coins")),
+		            ids.findForName(group("what")),
+		            group("amount")?.toInt() ?: 1
+	            )
             )
         }
     }
