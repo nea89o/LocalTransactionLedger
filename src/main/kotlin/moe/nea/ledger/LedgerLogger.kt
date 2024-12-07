@@ -157,6 +157,10 @@ enum class TransactionType {
 value class ItemId(
 	val string: String
 ) {
+	fun singleItem(): Pair<ItemId, Double> {
+		return Pair(this, 1.0)
+	}
+
 	companion object {
 		val COINS = ItemId("SKYBLOCK_COIN")
 		val BITS = ItemId("SKYBLOCK_BIT")

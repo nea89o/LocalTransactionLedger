@@ -1,6 +1,8 @@
 package moe.nea.ledger
 
 import moe.nea.ledger.events.BeforeGuiAction
+import moe.nea.ledger.events.ExtraSupplyIdEvent
+import moe.nea.ledger.events.RegistrationFinishedEvent
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
@@ -24,6 +26,11 @@ class ItemIdProvider {
 	}
 
 	private val knownNames = mutableMapOf<String, ItemId>()
+
+	@SubscribeEvent
+	fun onTick(event: RegistrationFinishedEvent) {
+		MinecraftForge.EVENT_BUS.post(ExtraSupplyIdEvent(knownNames::put))
+	}
 
 	@SubscribeEvent(priority = EventPriority.HIGH)
 	fun savePlayerInventoryIds(event: BeforeGuiAction) {
@@ -66,14 +73,30 @@ class ItemIdProvider {
 	}
 
 	private val coinRegex = "(?<amount>$SHORT_NUMBER_PATTERN) Coins?".toPattern()
-	private val stackedItem = "(?<name>.*) x(?<count>$SHORT_NUMBER_PATTERN)".toPattern()
+	private val stackedItemRegex = "(?<name>.*) x(?<count>$SHORT_NUMBER_PATTERN)".toPattern()
+	private val essenceRegex = "(?<essence>.*) Essence x(?<count>$SHORT_NUMBER_PATTERN)".toPattern()
 
-	fun findFromLore(name: String): Pair<ItemId, Double>? {
+	fun findCostItemsFromSpan(lore: List<String>): List<Pair<ItemId, Double>> {
+		return lore.iterator().asSequence()
+			.dropWhile { it.unformattedString() != "Cost" }.drop(1)
+			.takeWhile { it != "" }
+			.map { findStackableItemByName(it) ?: Pair(ItemId.NIL, 1.0) }
+			.toList()
+	}
+
+	fun findStackableItemByName(name: String): Pair<ItemId, Double>? {
 		val properName = name.unformattedString()
+		if (properName == "FREE") {
+			return Pair(ItemId.COINS, 0.0)
+		}
 		coinRegex.useMatcher(properName) {
 			return Pair(ItemId.COINS, parseShortNumber(group("amount")))
 		}
-		stackedItem.useMatcher(properName) {
+		essenceRegex.useMatcher(properName) {
+			return Pair(ItemId("ESSENCE_${group("essence").uppercase()}"),
+			            parseShortNumber(group("count")))
+		}
+		stackedItemRegex.useMatcher(properName) {
 			val item = findForName(group("name"))
 			if (item != null) {
 				val count = parseShortNumber(group("count"))

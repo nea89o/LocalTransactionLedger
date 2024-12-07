@@ -6,6 +6,7 @@ import moe.nea.ledger.config.LedgerConfig
 import moe.nea.ledger.database.Database
 import moe.nea.ledger.events.ChatReceived
 import moe.nea.ledger.events.LateWorldLoadEvent
+import moe.nea.ledger.events.RegistrationFinishedEvent
 import moe.nea.ledger.modules.AuctionHouseDetection
 import moe.nea.ledger.modules.BankDetection
 import moe.nea.ledger.modules.BazaarDetection
@@ -110,6 +111,7 @@ class Ledger {
 			.forEach { ClientCommandHandler.instance.registerCommand(it) }
 
 		di.provide<Database>().loadAndUpgrade()
+		MinecraftForge.EVENT_BUS.post(RegistrationFinishedEvent())
 	}
 
 	var lastJoin = -1L

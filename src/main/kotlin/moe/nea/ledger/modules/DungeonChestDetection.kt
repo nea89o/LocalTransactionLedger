@@ -1,23 +1,26 @@
 package moe.nea.ledger.modules
 
+import moe.nea.ledger.ExpiringValue
 import moe.nea.ledger.ItemChange
 import moe.nea.ledger.ItemId
+import moe.nea.ledger.ItemIdProvider
 import moe.nea.ledger.LedgerEntry
 import moe.nea.ledger.LedgerLogger
-import moe.nea.ledger.SHORT_NUMBER_PATTERN
 import moe.nea.ledger.TransactionType
 import moe.nea.ledger.events.ChatReceived
+import moe.nea.ledger.events.ExtraSupplyIdEvent
 import moe.nea.ledger.events.GuiClickEvent
 import moe.nea.ledger.getDisplayNameU
+import moe.nea.ledger.getInternalId
 import moe.nea.ledger.getLore
-import moe.nea.ledger.parseShortNumber
 import moe.nea.ledger.unformattedString
 import moe.nea.ledger.useMatcher
 import moe.nea.ledger.utils.Inject
+import net.minecraft.init.Blocks
+import net.minecraft.item.Item
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.time.Instant
-import java.util.regex.Pattern
+import kotlin.time.Duration.Companion.seconds
 
 class DungeonChestDetection @Inject constructor(val logger: LedgerLogger) {
 
@@ -49,16 +52,8 @@ class DungeonChestDetection @Inject constructor(val logger: LedgerLogger) {
 	Damage: 0s
 }
 	*/
-	val costPattern = Pattern.compile("(?<cost>$SHORT_NUMBER_PATTERN) Coins")
-
-
-	data class ChestCost(
-		val cost: Double,
-		val openTimestamp: Long,
-		val hasKey: Boolean,
-	)
-
-	var lastOpenedChest: ChestCost? = null
+	@Inject
+	lateinit var itemIdProvider: ItemIdProvider
 
 	@SubscribeEvent
 	fun onKismetClick(event: GuiClickEvent) {
@@ -78,6 +73,19 @@ class DungeonChestDetection @Inject constructor(val logger: LedgerLogger) {
 		}
 	}
 
+	data class ChestCost(
+		val diff: List<ItemChange>,
+		val timestamp: Instant,
+	)
+
+	var lastOpenedChest = ExpiringValue.empty<ChestCost>()
+
+	@SubscribeEvent
+	fun supplyExtraIds(event: ExtraSupplyIdEvent) {
+		event.store("Dungeon Chest Key", ItemId("DUNGEON_CHEST_KEY"))
+		event.store("Kismet Feather", ItemId("KISMET_FEATHER"))
+	}
+
 	@SubscribeEvent
 	fun onRewardChestClick(event: GuiClickEvent) {
 		val slot = event.slotIn ?: return
@@ -86,41 +94,36 @@ class DungeonChestDetection @Inject constructor(val logger: LedgerLogger) {
 		val name = stack.getDisplayNameU()
 		if (name != "§aOpen Reward Chest") return
 		val lore = stack.getLore()
-		val costIndex = lore.indexOf("§7Cost")
-		if (costIndex < 0 || costIndex + 1 !in lore.indices) return
-		val cost = costPattern.useMatcher(lore[costIndex + 1].unformattedString()) {
-			parseShortNumber(group("cost"))
-		} ?: 0.0 // Free chest!
-		val hasKey = lore.contains("§9Dungeon Chest Key")
-		lastOpenedChest?.let(::completeTransaction)
-		lastOpenedChest = ChestCost(cost, System.currentTimeMillis(), hasKey)
+		val cost = itemIdProvider.findCostItemsFromSpan(lore)
+		val gain = (9..18)
+			.mapNotNull { slot.inventory.getStackInSlot(it) }
+			.filter { it.item != Item.getItemFromBlock(Blocks.stained_glass_pane) }
+			.map {
+				it.getInternalId()?.singleItem()
+					?: itemIdProvider.findStackableItemByName(it.displayName)
+					?: Pair(ItemId.NIL, it.stackSize.toDouble())
+			}
+		lastOpenedChest = ExpiringValue(ChestCost(
+			cost.map { ItemChange.lose(it.first, it.second) }
+					+ gain.map { ItemChange.gain(it.first, it.second) },
+			Instant.now()
+		))
 	}
+
+	val rewardMessage = " .* CHEST REWARDS".toPattern()
 
 	@SubscribeEvent
 	fun onChatMessage(event: ChatReceived) {
-		if (event.message == "You don't have that many coins in the bank!")
-			lastOpenedChest = null
-	}
-
-	fun completeTransaction(toOpen: ChestCost) {
-		lastOpenedChest = null
-		logger.logEntry(
-			LedgerEntry(
+		if (event.message == "You don't have that many coins in the bank!") {
+			lastOpenedChest.take()
+		}
+		rewardMessage.useMatcher(event.message) {
+			val chest = lastOpenedChest.consume(3.seconds) ?: return
+			logger.logEntry(LedgerEntry(
 				TransactionType.DUNGEON_CHEST_OPEN,
-				Instant.ofEpochMilli(toOpen.openTimestamp),
-				listOfNotNull(
-					if (toOpen.hasKey) ItemChange.lose(ItemId.DUNGEON_CHEST_KEY, 1) else null,
-					ItemChange.loseCoins(toOpen.cost)
-				),
-			)
-		)
-	}
-
-	@SubscribeEvent
-	fun onTick(event: TickEvent) {
-		val toOpen = lastOpenedChest
-		if (toOpen != null && toOpen.openTimestamp + 1000L < System.currentTimeMillis()) {
-			completeTransaction(toOpen)
+				chest.timestamp,
+				chest.diff,
+			))
 		}
 	}
 }

@@ -16,7 +16,17 @@ fun ItemStack.getInternalId(): ItemId? {
 	if (id == "PET") {
 		id = getPetId() ?: id
 	}
+	if (id == "ENCHANTED_BOOK") {
+		id = getEnchanments().entries.singleOrNull()?.let {
+			"${it.key};${it.value}".uppercase()
+		}
+	}
 	return id?.let(::ItemId)
+}
+
+fun ItemStack.getEnchanments(): Map<String, Int> {
+	val enchantments = getExtraAttributes().getCompoundTag("enchantments")
+	return enchantments.keySet.associateWith { enchantments.getInteger(it) }
 }
 
 class PetInfo {

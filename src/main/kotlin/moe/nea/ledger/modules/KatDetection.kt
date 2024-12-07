@@ -10,7 +10,6 @@ import moe.nea.ledger.events.BeforeGuiAction
 import moe.nea.ledger.events.ChatReceived
 import moe.nea.ledger.getInternalId
 import moe.nea.ledger.getLore
-import moe.nea.ledger.unformattedString
 import moe.nea.ledger.useMatcher
 import moe.nea.ledger.utils.Inject
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -61,11 +60,7 @@ class KatDetection {
 		val beforePetId = petItem.getInternalId() ?: return
 		val confirmItem = slots.lowerChestInventory.getStackInSlot(confirmSlot) ?: return
 		val lore = confirmItem.getLore()
-		val cost = lore.iterator().asSequence()
-			.dropWhile { it.unformattedString() != "Cost" }.drop(1)
-			.takeWhile { it != "" }
-			.map { itemIdProvider.findFromLore(it) ?: Pair(ItemId.NIL, 1.0) }
-			.toList()
+		val cost = itemIdProvider.findCostItemsFromSpan(lore)
 		lastPetUpgradeScheduled = PetUpgrade(beforePetId, cost)
 	}
 
