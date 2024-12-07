@@ -86,7 +86,7 @@ class ItemIdProvider {
 
 	fun findStackableItemByName(name: String): Pair<ItemId, Double>? {
 		val properName = name.unformattedString()
-		if (properName == "FREE") {
+		if (properName == "FREE" || properName == "This Chest is Free!") {
 			return Pair(ItemId.COINS, 0.0)
 		}
 		coinRegex.useMatcher(properName) {

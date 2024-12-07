@@ -15,6 +15,7 @@ import moe.nea.ledger.modules.BitsDetection
 import moe.nea.ledger.modules.BitsShopDetection
 import moe.nea.ledger.modules.DungeonChestDetection
 import moe.nea.ledger.modules.KatDetection
+import moe.nea.ledger.modules.KuudraChestDetection
 import moe.nea.ledger.modules.MinionDetection
 import moe.nea.ledger.modules.NpcDetection
 import moe.nea.ledger.utils.DI
@@ -87,6 +88,8 @@ class Ledger {
 
 		val di = DI()
 		di.registerSingleton(this)
+		di.registerSingleton(Minecraft.getMinecraft())
+		di.registerSingleton(gson)
 		di.registerInjectableClasses(
 			AuctionHouseDetection::class.java,
 			BankDetection::class.java,
@@ -99,12 +102,12 @@ class Ledger {
 			DungeonChestDetection::class.java,
 			ItemIdProvider::class.java,
 			KatDetection::class.java,
+			KuudraChestDetection::class.java,
 			LedgerLogger::class.java,
 			LogChatCommand::class.java,
 			MinionDetection::class.java,
 			NpcDetection::class.java,
 		)
-		di.registerSingleton(gson)
 		di.instantiateAll()
 		di.getAllInstances().forEach(MinecraftForge.EVENT_BUS::register)
 		di.getAllInstances().filterIsInstance<ICommand>()

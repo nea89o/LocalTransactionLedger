@@ -149,6 +149,7 @@ enum class TransactionType {
 	KAT_TIMESKIP,
 	KAT_UPGRADE,
 	KISMET_REROLL,
+	KUUDRA_CHEST_OPEN,
 	NPC_BUY,
 	NPC_SELL,
 }
@@ -158,8 +159,13 @@ value class ItemId(
 	val string: String
 ) {
 	fun singleItem(): Pair<ItemId, Double> {
-		return Pair(this, 1.0)
+		return withStackSize(1)
 	}
+
+	fun withStackSize(size: Number): Pair<ItemId, Double> {
+		return Pair(this, size.toDouble())
+	}
+
 
 	companion object {
 		val COINS = ItemId("SKYBLOCK_COIN")
