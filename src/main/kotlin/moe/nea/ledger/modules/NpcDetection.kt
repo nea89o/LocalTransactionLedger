@@ -21,6 +21,8 @@ class NpcDetection @Inject constructor(val ledger: LedgerLogger, val ids: ItemId
 	val npcSellPattern =
 		Pattern.compile("You sold (?<what>.*) (x(?<count>$SHORT_NUMBER_PATTERN) )?for (?<coins>$SHORT_NUMBER_PATTERN) Coins!")
 
+	// TODO: IMPROVE BUYING FROM NPC TO INCLUDE ITEMS OTHER THAN COINS (KUUDRA KEYS ARE CHEAP)
+
 	@SubscribeEvent
 	fun onNpcBuy(event: ChatReceived) {
 		npcBuyPattern.useMatcher(event.message) {

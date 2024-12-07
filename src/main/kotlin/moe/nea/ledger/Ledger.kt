@@ -62,7 +62,8 @@ class Ledger {
 	// You sold Cactus x1 for 3 Coins!
 	// You bought back Potato x3 for 9 Coins!
 
-	TODO: TRADING, FORGE, COOKIE_EATEN
+	TODO: TRADING, FORGE, VISITORS / COPPER, CORPSES ÖFFNEN, HIGH / LOW GAMBLES, MINION ITEMS (maybe inferno refuel)
+	TODO: DUNGEON / KUUDRA LOOT, PET LEVELING COSTS AT KAT / FANN, SLAYER / MOB DROPS, SLAYER START COST
 	*/
 	companion object {
 		val dataFolder = File("money-ledger").apply { mkdirs() }
