@@ -24,7 +24,7 @@ class KuudraChestDetection : ChestDetection() {
 	lateinit var minecraft: Minecraft
 	fun hasKey(keyItem: ItemId): Boolean {
 		val p = minecraft.thePlayer ?: return false
-		return p.inventory.mainInventory.any { it.getInternalId() == keyItem }
+		return p.inventory.mainInventory.any { it?.getInternalId() == keyItem }
 	}
 
 	@SubscribeEvent
