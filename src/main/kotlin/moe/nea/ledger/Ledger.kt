@@ -1,5 +1,6 @@
 package moe.nea.ledger
 
+import com.google.gson.Gson
 import io.github.notenoughupdates.moulconfig.managed.ManagedConfig
 import moe.nea.ledger.config.LedgerConfig
 import moe.nea.ledger.database.Database
@@ -12,6 +13,7 @@ import moe.nea.ledger.modules.BazaarOrderDetection
 import moe.nea.ledger.modules.BitsDetection
 import moe.nea.ledger.modules.BitsShopDetection
 import moe.nea.ledger.modules.DungeonChestDetection
+import moe.nea.ledger.modules.KatDetection
 import moe.nea.ledger.modules.MinionDetection
 import moe.nea.ledger.modules.NpcDetection
 import moe.nea.ledger.utils.DI
@@ -71,6 +73,7 @@ class Ledger {
 		val managedConfig = ManagedConfig.create(File("config/money-ledger/config.json"), LedgerConfig::class.java) {
 			checkExpose = false
 		}
+		val gson = Gson()
 		private val tickQueue = ConcurrentLinkedQueue<Runnable>()
 		fun runLater(runnable: Runnable) {
 			tickQueue.add(runnable)
@@ -84,21 +87,23 @@ class Ledger {
 		val di = DI()
 		di.registerSingleton(this)
 		di.registerInjectableClasses(
-			LedgerLogger::class.java,
-			ItemIdProvider::class.java,
+			AuctionHouseDetection::class.java,
 			BankDetection::class.java,
 			BazaarDetection::class.java,
-			DungeonChestDetection::class.java,
 			BazaarOrderDetection::class.java,
-			AuctionHouseDetection::class.java,
 			BitsDetection::class.java,
 			BitsShopDetection::class.java,
+			ConfigCommand::class.java,
+			Database::class.java,
+			DungeonChestDetection::class.java,
+			ItemIdProvider::class.java,
+			KatDetection::class.java,
+			LedgerLogger::class.java,
+			LogChatCommand::class.java,
 			MinionDetection::class.java,
 			NpcDetection::class.java,
-			LogChatCommand::class.java,
-			ConfigCommand::class.java,
-			Database::class.java
 		)
+		di.registerSingleton(gson)
 		di.instantiateAll()
 		di.getAllInstances().forEach(MinecraftForge.EVENT_BUS::register)
 		di.getAllInstances().filterIsInstance<ICommand>()

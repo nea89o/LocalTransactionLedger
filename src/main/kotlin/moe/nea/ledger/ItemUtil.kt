@@ -4,25 +4,56 @@ import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 
 
-fun ItemStack.getInternalId(): ItemId? {
-    val nbt = this.tagCompound ?: NBTTagCompound()
-    val extraAttributes = nbt.getCompoundTag("ExtraAttributes")
-    val id = extraAttributes.getString("id")
-    return id.takeIf { it.isNotBlank() }?.let(::ItemId)
+fun ItemStack.getExtraAttributes(): NBTTagCompound {
+	val nbt = this.tagCompound ?: return NBTTagCompound()
+	return nbt.getCompoundTag("ExtraAttributes")
 }
 
+fun ItemStack.getInternalId(): ItemId? {
+	val extraAttributes = getExtraAttributes()
+	var id = extraAttributes.getString("id")
+	id = id.takeIf { it.isNotBlank() }
+	if (id == "PET") {
+		id = getPetId() ?: id
+	}
+	return id?.let(::ItemId)
+}
+
+class PetInfo {
+	var type: String? = null
+	var tier: String? = null
+}
+
+fun ItemStack.getPetId(): String? {
+	val petInfoStr = getExtraAttributes().getString("petInfo")
+	val petInfo = Ledger.gson.fromJson(petInfoStr, PetInfo::class.java)
+	if (petInfo.type == null || petInfo.tier == null) return null
+	return petInfo.type + ";" + rarityToIndex(petInfo.tier ?: "")
+}
+
+fun rarityToIndex(rarity: String): Int {
+	return when (rarity) {
+		"COMMON" -> 0
+		"UNCOMMON" -> 1
+		"RARE" -> 2
+		"EPIC" -> 3
+		"LEGENDARY" -> 4
+		"MYTHIC" -> 5
+		else -> -1
+	}
+}
 
 fun ItemStack.getLore(): List<String> {
-    val nbt = this.tagCompound ?: NBTTagCompound()
-    val extraAttributes = nbt.getCompoundTag("display")
-    val lore = extraAttributes.getTagList("Lore", 8)
-    return (0 until lore.tagCount()).map { lore.getStringTagAt(it) }
+	val nbt = this.tagCompound ?: NBTTagCompound()
+	val extraAttributes = nbt.getCompoundTag("display")
+	val lore = extraAttributes.getTagList("Lore", 8)
+	return (0 until lore.tagCount()).map { lore.getStringTagAt(it) }
 }
 
 
 fun ItemStack.getDisplayNameU(): String {
-    val nbt = this.tagCompound ?: NBTTagCompound()
-    val extraAttributes = nbt.getCompoundTag("display")
-    return extraAttributes.getString("Name")
+	val nbt = this.tagCompound ?: NBTTagCompound()
+	val extraAttributes = nbt.getCompoundTag("display")
+	return extraAttributes.getString("Name")
 }
 
