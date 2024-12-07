@@ -18,6 +18,7 @@ import moe.nea.ledger.modules.KatDetection
 import moe.nea.ledger.modules.KuudraChestDetection
 import moe.nea.ledger.modules.MinionDetection
 import moe.nea.ledger.modules.NpcDetection
+import moe.nea.ledger.modules.VisitorDetection
 import moe.nea.ledger.utils.DI
 import net.minecraft.client.Minecraft
 import net.minecraft.command.ICommand
@@ -67,7 +68,7 @@ class Ledger {
 	// You bought back Potato x3 for 9 Coins!
 
 	TODO: TRADING, FORGE, VISITORS / COPPER, CORPSES ÖFFNEN, HIGH / LOW GAMBLES, MINION ITEMS (maybe inferno refuel)
-	TODO: DUNGEON / KUUDRA LOOT, PET LEVELING COSTS AT KAT / FANN, SLAYER / MOB DROPS, SLAYER START COST
+	TODO: PET LEVELING COSTS AT FANN, SLAYER / MOB DROPS, SLAYER START COST
 	*/
 	companion object {
 		val dataFolder = File("money-ledger").apply { mkdirs() }
@@ -107,6 +108,7 @@ class Ledger {
 			LogChatCommand::class.java,
 			MinionDetection::class.java,
 			NpcDetection::class.java,
+			VisitorDetection::class.java,
 		)
 		di.instantiateAll()
 		di.getAllInstances().forEach(MinecraftForge.EVENT_BUS::register)

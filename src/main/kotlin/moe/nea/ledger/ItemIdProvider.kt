@@ -68,8 +68,13 @@ class ItemIdProvider {
 		}
 	}
 
-	fun findForName(name: String): ItemId? {
-		return knownNames[name]
+	// TODO: make use of colour
+	fun findForName(name: String, fallbackToGenerated: Boolean = true): ItemId? {
+		var id = knownNames[name]
+		if (id == null && fallbackToGenerated) {
+			id = ItemId(name.uppercase().replace(" ", "_"))
+		}
+		return id
 	}
 
 	private val coinRegex = "(?<amount>$SHORT_NUMBER_PATTERN) Coins?".toPattern()
@@ -84,7 +89,7 @@ class ItemIdProvider {
 			.toList()
 	}
 
-	fun findStackableItemByName(name: String): Pair<ItemId, Double>? {
+	fun findStackableItemByName(name: String, fallbackToGenerated: Boolean = false): Pair<ItemId, Double>? {
 		val properName = name.unformattedString()
 		if (properName == "FREE" || properName == "This Chest is Free!") {
 			return Pair(ItemId.COINS, 0.0)
@@ -97,12 +102,12 @@ class ItemIdProvider {
 			            parseShortNumber(group("count")))
 		}
 		stackedItemRegex.useMatcher(properName) {
-			val item = findForName(group("name"))
+			var item = findForName(group("name"), fallbackToGenerated)
 			if (item != null) {
 				val count = parseShortNumber(group("count"))
 				return Pair(item, count)
 			}
 		}
-		return findForName(properName)?.let { Pair(it, 1.0) }
+		return findForName(properName, fallbackToGenerated)?.let { Pair(it, 1.0) }
 	}
 }

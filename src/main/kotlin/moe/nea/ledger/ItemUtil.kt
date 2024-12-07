@@ -9,7 +9,8 @@ fun ItemStack.getExtraAttributes(): NBTTagCompound {
 	return nbt.getCompoundTag("ExtraAttributes")
 }
 
-fun ItemStack.getInternalId(): ItemId? {
+fun ItemStack?.getInternalId(): ItemId? {
+	if (this == null) return null
 	val extraAttributes = getExtraAttributes()
 	var id = extraAttributes.getString("id")
 	id = id.takeIf { it.isNotBlank() }
