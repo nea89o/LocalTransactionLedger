@@ -9,6 +9,7 @@ import moe.nea.ledger.events.ChatReceived
 import moe.nea.ledger.utils.Inject
 import net.minecraft.client.Minecraft
 import net.minecraft.util.ChatComponentText
+import net.minecraft.util.IChatComponent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import java.io.File
@@ -17,8 +18,9 @@ import java.util.Date
 import java.util.UUID
 
 class LedgerLogger {
-	fun printOut(text: String) {
-		Minecraft.getMinecraft().ingameGUI?.chatGUI?.printChatMessage(ChatComponentText(text))
+	fun printOut(text: String) = printOut(ChatComponentText(text))
+	fun printOut(comp: IChatComponent) {
+		Minecraft.getMinecraft().ingameGUI?.chatGUI?.printChatMessage(comp)
 	}
 
 	val profileIdPattern =

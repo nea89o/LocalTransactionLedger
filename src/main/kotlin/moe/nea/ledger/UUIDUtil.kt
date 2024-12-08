@@ -12,6 +12,10 @@ object UUIDUtil {
 	value class ULIDWrapper(
 		val wrapped: String
 	) {
+		fun getTimestamp(): Instant {
+			return Instant.ofEpochMilli(ULID.getTimestamp(wrapped))
+		}
+
 		init {
 			require(ULID.isValid(wrapped))
 		}

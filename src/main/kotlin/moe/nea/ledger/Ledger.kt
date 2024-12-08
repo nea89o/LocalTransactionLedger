@@ -108,6 +108,7 @@ class Ledger {
 			LogChatCommand::class.java,
 			MinionDetection::class.java,
 			NpcDetection::class.java,
+			QueryCommand::class.java,
 			VisitorDetection::class.java,
 		)
 		di.instantiateAll()

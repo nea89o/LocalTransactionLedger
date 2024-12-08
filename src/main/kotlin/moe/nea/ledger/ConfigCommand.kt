@@ -10,7 +10,7 @@ class ConfigCommand : CommandBase() {
 	}
 
 	override fun getCommandName(): String {
-		return "ledger"
+		return "ledgerconfig"
 	}
 
 	override fun getCommandUsage(sender: ICommandSender?): String {

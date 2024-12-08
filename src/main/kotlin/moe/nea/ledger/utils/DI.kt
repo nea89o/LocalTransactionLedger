@@ -62,4 +62,7 @@ class DI {
 	private val values = mutableMapOf<Pair<Class<*>, *>, Any>()
 	private val providers = mutableMapOf<Class<*>, BaseDIProvider<*, *>>()
 
+	init {
+		registerSingleton(this)
+	}
 }
