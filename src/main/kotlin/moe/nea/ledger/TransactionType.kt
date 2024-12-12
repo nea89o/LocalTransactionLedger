@@ -2,6 +2,7 @@ package moe.nea.ledger
 
 enum class TransactionType {
 	AUCTION_BOUGHT,
+	AUCTION_LISTING_CHARGE,
 	AUCTION_SOLD,
 	AUTOMERCHANT_PROFIT_COLLECT,
 	BANK_DEPOSIT,

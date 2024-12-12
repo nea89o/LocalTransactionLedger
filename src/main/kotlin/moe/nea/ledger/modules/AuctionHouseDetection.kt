@@ -1,5 +1,6 @@
 package moe.nea.ledger.modules
 
+import moe.nea.ledger.ExpiringValue
 import moe.nea.ledger.ItemChange
 import moe.nea.ledger.ItemId
 import moe.nea.ledger.ItemIdProvider
@@ -19,6 +20,7 @@ import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
+import kotlin.time.Duration.Companion.seconds
 
 class AuctionHouseDetection @Inject constructor(val ledger: LedgerLogger, val ids: ItemIdProvider) {
 	data class LastViewedItem(
@@ -31,6 +33,39 @@ class AuctionHouseDetection @Inject constructor(val ledger: LedgerLogger, val id
 		You purchased 2x Walnut for 69 coins!
 		You purchased ◆ Ice Rune I for 4,000 coins!
 	 */
+
+	val createAuctionScreen = "Confirm( BIN)? Auction".toPattern()
+	val auctionCreationCostPattern = "Cost: (?<cost>$SHORT_NUMBER_PATTERN) coins?".toPattern()
+
+	val auctionCreatedChatPattern = "(BIN )?Auction started for .*".toPattern()
+
+	var lastCreationCost: ExpiringValue<Double> = ExpiringValue.empty()
+
+	@SubscribeEvent
+	fun onCreateAuctionClick(event: BeforeGuiAction) {
+		val slots = event.chestSlots ?: return
+		if (!createAuctionScreen.asPredicate().test(slots.lowerChestInventory.name)) return
+		val auctionSlot = slots.lowerChestInventory.getStackInSlot(9 + 2) ?: return
+		val creationCost = auctionSlot.getLore().firstNotNullOfOrNull {
+			auctionCreationCostPattern.useMatcher(it.unformattedString()) { parseShortNumber(group("cost")) }
+		}
+		if (creationCost != null) {
+			lastCreationCost = ExpiringValue(creationCost)
+		}
+	}
+
+	@SubscribeEvent
+	fun onCreateAuctionChat(event: ChatReceived) {
+		auctionCreatedChatPattern.useMatcher(event.message) {
+			lastCreationCost.consume(3.seconds)?.let { cost ->
+				ledger.logEntry(LedgerEntry(
+					TransactionType.AUCTION_LISTING_CHARGE,
+					event.timestamp,
+					listOf(ItemChange.loseCoins(cost))
+				))
+			}
+		}
+	}
 
 	val collectSold =
 		Pattern.compile("You collected (?<coins>$SHORT_NUMBER_PATTERN) coins? from selling (?<what>.*) to (?<buyer>.*) in an auction!")
