@@ -37,8 +37,8 @@ class PetInfo {
 
 fun ItemStack.getPetId(): String? {
 	val petInfoStr = getExtraAttributes().getString("petInfo")
-	val petInfo = Ledger.gson.fromJson(petInfoStr, PetInfo::class.java)
-	if (petInfo.type == null || petInfo.tier == null) return null
+	val petInfo = runCatching { Ledger.gson.fromJson(petInfoStr, PetInfo::class.java) }.getOrNull() // TODO: error reporting to sentry
+	if (petInfo?.type == null || petInfo.tier == null) return null
 	return petInfo.type + ";" + rarityToIndex(petInfo.tier ?: "")
 }
 
