@@ -18,7 +18,7 @@ fun cmd(vararg args: String): String {
 		standardOutput = baos
 		commandLine(*args)
 	}
-	return baos.toByteArray().decodeToString()
+		return baos.toByteArray().decodeToString().trim()
 }
 
 
