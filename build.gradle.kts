@@ -1,3 +1,4 @@
+import com.github.gmazzo.buildconfig.BuildConfigExtension
 import org.apache.commons.lang3.SystemUtils
 import java.io.ByteArrayOutputStream
 
@@ -7,6 +8,7 @@ plugins {
 	id("gg.essential.loom") version "0.10.0.+"
 	id("dev.architectury.architectury-pack200") version "0.1.3"
 	id("com.github.johnrengelman.shadow") version "8.1.1"
+	id("com.github.gmazzo.buildconfig") version "5.5.0"
 	kotlin("jvm") version "2.0.20"
 }
 
@@ -22,7 +24,9 @@ fun cmd(vararg args: String): String {
 
 val baseGroup: String by project
 val mcVersion: String by project
-val version: String = project.property("mod_version").toString() + "-" + cmd("git", "rev-parse", "--short", "HEAD")
+val gitVersion = cmd("git", "rev-parse", "--short", "HEAD")
+val fullVersion = project.property("mod_version").toString()
+val version: String = "$fullVersion-$gitVersion"
 val mixinGroup = "$baseGroup.mixin"
 project.version = version
 val modid: String by project
@@ -155,4 +159,11 @@ tasks.shadowJar {
 }
 
 tasks.assemble.get().dependsOn(tasks.remapJar)
+
+configure<BuildConfigExtension> {
+	packageName("moe.nea.ledger.gen")
+	buildConfigField<String>("VERSION", version)
+	buildConfigField<String>("FULL_VERSION", fullVersion)
+	buildConfigField<String>("GIT_COMMIT", gitVersion)
+}
 

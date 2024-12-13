@@ -7,6 +7,7 @@ import moe.nea.ledger.database.Database
 import moe.nea.ledger.events.ChatReceived
 import moe.nea.ledger.events.LateWorldLoadEvent
 import moe.nea.ledger.events.RegistrationFinishedEvent
+import moe.nea.ledger.gen.BuildConfig
 import moe.nea.ledger.modules.AuctionHouseDetection
 import moe.nea.ledger.modules.BankDetection
 import moe.nea.ledger.modules.BazaarDetection
@@ -20,6 +21,7 @@ import moe.nea.ledger.modules.MinionDetection
 import moe.nea.ledger.modules.NpcDetection
 import moe.nea.ledger.modules.VisitorDetection
 import moe.nea.ledger.utils.DI
+import moe.nea.ledger.utils.ErrorUtil
 import net.minecraft.client.Minecraft
 import net.minecraft.command.ICommand
 import net.minecraftforge.client.ClientCommandHandler
@@ -36,7 +38,7 @@ import org.apache.logging.log4j.LogManager
 import java.io.File
 import java.util.concurrent.ConcurrentLinkedQueue
 
-@Mod(modid = "ledger", useMetadata = true)
+@Mod(modid = "ledger", useMetadata = true, version = BuildConfig.VERSION)
 class Ledger {
 	/*
 	You have withdrawn 1M coins! You now have 518M coins in your account!
@@ -88,6 +90,7 @@ class Ledger {
 		logger.info("Initializing ledger")
 
 		val di = DI()
+		TelemetryProvider.setupFor(di)
 		di.registerSingleton(this)
 		di.registerSingleton(Minecraft.getMinecraft())
 		di.registerSingleton(gson)
@@ -101,6 +104,7 @@ class Ledger {
 			ConfigCommand::class.java,
 			Database::class.java,
 			DungeonChestDetection::class.java,
+			ErrorUtil::class.java,
 			ItemIdProvider::class.java,
 			KatDetection::class.java,
 			KuudraChestDetection::class.java,
@@ -111,12 +115,19 @@ class Ledger {
 			QueryCommand::class.java,
 			VisitorDetection::class.java,
 		)
-		di.instantiateAll()
-		di.getAllInstances().forEach(MinecraftForge.EVENT_BUS::register)
-		di.getAllInstances().filterIsInstance<ICommand>()
-			.forEach { ClientCommandHandler.instance.registerCommand(it) }
+		val errorUtil = di.provide<ErrorUtil>()
+		errorUtil.catch {
+			di.instantiateAll()
+			di.getAllInstances().forEach(MinecraftForge.EVENT_BUS::register)
+			di.getAllInstances().filterIsInstance<ICommand>()
+				.forEach { ClientCommandHandler.instance.registerCommand(it) }
+		}
 
-		di.provide<Database>().loadAndUpgrade()
+		errorUtil.catch {
+			di.provide<Database>().loadAndUpgrade()
+			error("Lol")
+		}
+
 		MinecraftForge.EVENT_BUS.post(RegistrationFinishedEvent())
 	}
 
