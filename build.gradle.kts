@@ -1,4 +1,5 @@
 import org.apache.commons.lang3.SystemUtils
+import java.io.ByteArrayOutputStream
 
 plugins {
 	idea
@@ -9,10 +10,21 @@ plugins {
 	kotlin("jvm") version "2.0.20"
 }
 
+fun cmd(vararg args: String): String {
+	val baos = ByteArrayOutputStream()
+	exec {
+		standardOutput = baos
+		commandLine(*args)
+	}
+	return baos.toByteArray().decodeToString()
+}
+
+
 val baseGroup: String by project
 val mcVersion: String by project
-val version: String by project
+val version: String = project.property("mod_version").toString() + "-" + cmd("git", "rev-parse", "--short", "HEAD")
 val mixinGroup = "$baseGroup.mixin"
+project.version = version
 val modid: String by project
 
 // Toolchains:
