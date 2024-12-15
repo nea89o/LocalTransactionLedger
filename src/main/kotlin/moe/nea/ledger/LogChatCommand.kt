@@ -1,6 +1,6 @@
 package moe.nea.ledger
 
-import moe.nea.ledger.utils.Inject
+import moe.nea.ledger.utils.di.Inject
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
 

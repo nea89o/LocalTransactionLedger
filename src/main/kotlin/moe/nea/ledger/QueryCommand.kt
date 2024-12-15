@@ -6,7 +6,7 @@ import moe.nea.ledger.database.Clause
 import moe.nea.ledger.database.DBItemEntry
 import moe.nea.ledger.database.DBLogEntry
 import moe.nea.ledger.database.Database
-import moe.nea.ledger.utils.Inject
+import moe.nea.ledger.utils.di.Inject
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
 import net.minecraft.util.ChatComponentText

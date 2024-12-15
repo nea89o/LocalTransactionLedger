@@ -11,7 +11,7 @@ import moe.nea.ledger.events.ChatReceived
 import moe.nea.ledger.getInternalId
 import moe.nea.ledger.getLore
 import moe.nea.ledger.useMatcher
-import moe.nea.ledger.utils.Inject
+import moe.nea.ledger.utils.di.Inject
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 

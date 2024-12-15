@@ -28,7 +28,7 @@ class ItemIdProvider {
 	private val knownNames = mutableMapOf<String, ItemId>()
 
 	@SubscribeEvent
-	fun onTick(event: RegistrationFinishedEvent) {
+	fun onRegistrationFinished(event: RegistrationFinishedEvent) {
 		MinecraftForge.EVENT_BUS.post(ExtraSupplyIdEvent(knownNames::put))
 	}
 

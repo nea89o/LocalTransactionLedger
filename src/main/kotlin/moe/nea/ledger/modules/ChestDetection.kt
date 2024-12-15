@@ -7,7 +7,7 @@ import moe.nea.ledger.getDisplayNameU
 import moe.nea.ledger.getInternalId
 import moe.nea.ledger.getLore
 import moe.nea.ledger.unformattedString
-import moe.nea.ledger.utils.Inject
+import moe.nea.ledger.utils.di.Inject
 import net.minecraft.init.Blocks
 import net.minecraft.inventory.Slot
 import net.minecraft.item.Item

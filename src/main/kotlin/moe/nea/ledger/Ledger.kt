@@ -20,7 +20,7 @@ import moe.nea.ledger.modules.KuudraChestDetection
 import moe.nea.ledger.modules.MinionDetection
 import moe.nea.ledger.modules.NpcDetection
 import moe.nea.ledger.modules.VisitorDetection
-import moe.nea.ledger.utils.DI
+import moe.nea.ledger.utils.di.DI
 import moe.nea.ledger.utils.ErrorUtil
 import net.minecraft.client.Minecraft
 import net.minecraft.command.ICommand

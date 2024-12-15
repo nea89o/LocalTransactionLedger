@@ -1,4 +1,4 @@
-package moe.nea.ledger.utils
+package moe.nea.ledger.utils.di
 
 import java.lang.reflect.AnnotatedElement
 import java.lang.reflect.Constructor

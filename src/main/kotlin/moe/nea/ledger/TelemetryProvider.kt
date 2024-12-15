@@ -4,8 +4,8 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import moe.nea.ledger.gen.BuildConfig
-import moe.nea.ledger.utils.DI
-import moe.nea.ledger.utils.DIProvider
+import moe.nea.ledger.utils.di.DI
+import moe.nea.ledger.utils.di.DIProvider
 import moe.nea.ledger.utils.telemetry.CommonKeys
 import moe.nea.ledger.utils.telemetry.ContextValue
 import moe.nea.ledger.utils.telemetry.EventRecorder

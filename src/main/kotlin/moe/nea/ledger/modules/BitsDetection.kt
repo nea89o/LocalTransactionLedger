@@ -12,7 +12,7 @@ import moe.nea.ledger.TransactionType
 import moe.nea.ledger.parseShortNumber
 import moe.nea.ledger.unformattedString
 import moe.nea.ledger.useMatcher
-import moe.nea.ledger.utils.Inject
+import moe.nea.ledger.utils.di.Inject
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.time.Instant
 

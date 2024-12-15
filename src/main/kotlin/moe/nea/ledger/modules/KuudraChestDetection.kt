@@ -7,7 +7,7 @@ import moe.nea.ledger.LedgerLogger
 import moe.nea.ledger.TransactionType
 import moe.nea.ledger.events.GuiClickEvent
 import moe.nea.ledger.getInternalId
-import moe.nea.ledger.utils.Inject
+import moe.nea.ledger.utils.di.Inject
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 

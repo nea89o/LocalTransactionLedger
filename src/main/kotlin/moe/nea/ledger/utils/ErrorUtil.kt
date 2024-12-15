@@ -1,5 +1,6 @@
 package moe.nea.ledger.utils
 
+import moe.nea.ledger.utils.di.Inject
 import moe.nea.ledger.utils.telemetry.ContextValue
 import moe.nea.ledger.utils.telemetry.EventRecorder
 import moe.nea.ledger.utils.telemetry.Span
