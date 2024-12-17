@@ -6,6 +6,9 @@ import java.util.Stack
 
 @Suppress("UNCHECKED_CAST")
 class DI {
+	private fun formatInjectionStack() =
+		injectionStack.joinToString(" -> ")
+
 	private fun <T : Any, C> internalProvide(type: Class<T>, element: AnnotatedElement? = null): T {
 		val provider = providers[type] as BaseDIProvider<T, C>
 		val context = if (element == null) provider.createEmptyContext() else provider.createContext(element)
@@ -13,13 +16,13 @@ class DI {
 		val existingValue = values[key]
 		if (existingValue != null) return existingValue as T
 		if (type in injectionStack) {
-			error("Found injection cycle: ${injectionStack.joinToString(" -> ")} -> $type")
+			error("Found injection cycle: ${formatInjectionStack()} -> $type")
 		}
 		injectionStack.push(type)
 		val value = try {
 			provider.provideWithContext(this, context)
 		} catch (ex: Exception) {
-			throw RuntimeException("Could not create instance for type $type", ex)
+			throw RuntimeException("Could not create instance for type $type (in stack ${formatInjectionStack()})", ex)
 		}
 		val cycleCheckCookie = injectionStack.pop()
 		require(cycleCheckCookie == type) { "Unbalanced stack cookie: $cycleCheckCookie != $type" }

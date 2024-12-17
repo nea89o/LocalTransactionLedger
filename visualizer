@@ -1,0 +1,5 @@
+graph = bars | delta
+selector = {
+     [itemId = SKYBLOCK_COIN, direction = GAINED] = GREEN
+     [itemId = SKYBLOCK_COIN, direction = LOST] = RED
+}

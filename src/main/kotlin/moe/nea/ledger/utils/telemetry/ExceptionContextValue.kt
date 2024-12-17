@@ -22,8 +22,9 @@ class ExceptionContextValue(val exception: Throwable) : ContextValue {
 		obj.addProperty("message", exception.message)
 		// TODO: allow exceptions to implement an "extra info" interface
 		if (searchDepth > 0) {
-			if (exception.cause != null) {
-				obj.add("cause", walkExceptions(exception, searchDepth - 1))
+			val cause = exception.cause
+			if (cause != null && cause !== exception) {
+				obj.add("cause", walkExceptions(cause, searchDepth - 1))
 			}
 			val suppressions = JsonArray()
 			for (suppressedException in exception.suppressedExceptions) {

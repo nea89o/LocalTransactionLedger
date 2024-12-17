@@ -10,6 +10,11 @@ class ErrorUtil {
 	@Inject
 	lateinit var reporter: EventRecorder
 
+	fun reportAdHoc(message: String) {
+		report(Exception(message), message)
+
+	}
+
 	fun report(exception: Throwable, message: String?) {
 		Span.current().recordException(reporter, exception, message)
 	}

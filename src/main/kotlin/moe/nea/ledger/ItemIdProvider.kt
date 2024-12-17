@@ -3,6 +3,8 @@ package moe.nea.ledger
 import moe.nea.ledger.events.BeforeGuiAction
 import moe.nea.ledger.events.ExtraSupplyIdEvent
 import moe.nea.ledger.events.RegistrationFinishedEvent
+import moe.nea.ledger.events.SupplyDebugInfo
+import moe.nea.ledger.modules.ExternalDataProvider
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
@@ -28,6 +30,13 @@ class ItemIdProvider {
 	private val knownNames = mutableMapOf<String, ItemId>()
 
 	@SubscribeEvent
+	fun onDataLoaded(event: ExternalDataProvider.DataLoaded) {
+		event.provider.itemNames.forEach { (itemId, itemName) ->
+			knownNames[itemName.unformattedString().trim()] = ItemId(itemId)
+		}
+	}
+
+	@SubscribeEvent
 	fun onRegistrationFinished(event: RegistrationFinishedEvent) {
 		MinecraftForge.EVENT_BUS.post(ExtraSupplyIdEvent(knownNames::put))
 	}
@@ -38,6 +47,11 @@ class ItemIdProvider {
 		val inventory = player.inventory ?: return
 		inventory.mainInventory?.forEach { saveFromSlot(it) }
 		inventory.armorInventory?.forEach { saveFromSlot(it) }
+	}
+
+	@SubscribeEvent
+	fun onDebugData(event: SupplyDebugInfo) {
+		event.record("knownItemNames", knownNames.size)
 	}
 
 	fun saveFromSlot(stack: ItemStack?, preprocessName: (String) -> String = { it }) {

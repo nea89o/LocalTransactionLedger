@@ -15,13 +15,15 @@ import moe.nea.ledger.modules.BazaarOrderDetection
 import moe.nea.ledger.modules.BitsDetection
 import moe.nea.ledger.modules.BitsShopDetection
 import moe.nea.ledger.modules.DungeonChestDetection
+import moe.nea.ledger.modules.ExternalDataProvider
 import moe.nea.ledger.modules.KatDetection
 import moe.nea.ledger.modules.KuudraChestDetection
 import moe.nea.ledger.modules.MinionDetection
 import moe.nea.ledger.modules.NpcDetection
 import moe.nea.ledger.modules.VisitorDetection
-import moe.nea.ledger.utils.di.DI
 import moe.nea.ledger.utils.ErrorUtil
+import moe.nea.ledger.utils.di.DI
+import moe.nea.ledger.utils.network.RequestUtil
 import net.minecraft.client.Minecraft
 import net.minecraft.command.ICommand
 import net.minecraftforge.client.ClientCommandHandler
@@ -99,12 +101,14 @@ class Ledger {
 			BankDetection::class.java,
 			BazaarDetection::class.java,
 			BazaarOrderDetection::class.java,
+			DebugDataCommand::class.java,
 			BitsDetection::class.java,
 			BitsShopDetection::class.java,
 			ConfigCommand::class.java,
 			Database::class.java,
 			DungeonChestDetection::class.java,
 			ErrorUtil::class.java,
+			ExternalDataProvider::class.java,
 			ItemIdProvider::class.java,
 			KatDetection::class.java,
 			KuudraChestDetection::class.java,
@@ -113,6 +117,7 @@ class Ledger {
 			MinionDetection::class.java,
 			NpcDetection::class.java,
 			QueryCommand::class.java,
+			RequestUtil::class.java,
 			VisitorDetection::class.java,
 		)
 		val errorUtil = di.provide<ErrorUtil>()
@@ -125,7 +130,6 @@ class Ledger {
 
 		errorUtil.catch {
 			di.provide<Database>().loadAndUpgrade()
-			error("Lol")
 		}
 
 		MinecraftForge.EVENT_BUS.post(RegistrationFinishedEvent())

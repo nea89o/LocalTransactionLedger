@@ -24,6 +24,7 @@ fun interface DIProvider<T : Any> : BaseDIProvider<T, Unit> {
 				?: clazz.constructors.find { it.parameterCount == 0 }
 				?: error("Could not find DI injection entrypoint for class $clazz"))
 					as Constructor<out T>
+			// TODO: consider using unsafe init to inject the parameters *before* calling the constructor
 			return DIProvider { di ->
 				val typArgs = cons.parameters.map {
 					di.provide(it.type, it)
