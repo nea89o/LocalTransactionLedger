@@ -1,5 +1,6 @@
 package moe.nea.ledger
 
+import net.minecraft.inventory.IInventory
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 
@@ -37,7 +38,10 @@ class PetInfo {
 
 fun ItemStack.getPetId(): String? {
 	val petInfoStr = getExtraAttributes().getString("petInfo")
-	val petInfo = runCatching { Ledger.gson.fromJson(petInfoStr, PetInfo::class.java) }.getOrNull() // TODO: error reporting to sentry
+	val petInfo = runCatching {
+		Ledger.gson.fromJson(petInfoStr,
+		                     PetInfo::class.java)
+	}.getOrNull() // TODO: error reporting to sentry
 	if (petInfo?.type == null || petInfo.tier == null) return null
 	return petInfo.type + ";" + rarityToIndex(petInfo.tier ?: "")
 }
@@ -61,6 +65,22 @@ fun ItemStack.getLore(): List<String> {
 	return (0 until lore.tagCount()).map { lore.getStringTagAt(it) }
 }
 
+
+fun IInventory.asIterable(): Iterable<ItemStack?> = object : Iterable<ItemStack?> {
+	override fun iterator(): Iterator<ItemStack?> {
+		return object : Iterator<ItemStack?> {
+			var i = 0
+			override fun hasNext(): Boolean {
+				return i < this@asIterable.sizeInventory
+			}
+
+			override fun next(): ItemStack? {
+				if (!hasNext()) throw NoSuchElementException("$i is out of range for inventory ${this@asIterable}")
+				return this@asIterable.getStackInSlot(i++)
+			}
+		}
+	}
+}
 
 fun ItemStack.getDisplayNameU(): String {
 	val nbt = this.tagCompound ?: NBTTagCompound()

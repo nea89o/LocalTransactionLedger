@@ -29,16 +29,24 @@ class ItemIdProvider {
 
 	private val knownNames = mutableMapOf<String, ItemId>()
 
+	fun createLookupTagFromDisplayName(itemName: String): String {
+		return itemName.unformattedString().trim().lowercase()
+	}
+
+	fun saveKnownItem(itemName: String, itemId: ItemId) {
+		knownNames[createLookupTagFromDisplayName(itemName)] = itemId
+	}
+
 	@SubscribeEvent
 	fun onDataLoaded(event: ExternalDataProvider.DataLoaded) {
 		event.provider.itemNames.forEach { (itemId, itemName) ->
-			knownNames[itemName.unformattedString().trim()] = ItemId(itemId)
+			saveKnownItem(itemName, ItemId(itemId))
 		}
 	}
 
 	@SubscribeEvent
 	fun onRegistrationFinished(event: RegistrationFinishedEvent) {
-		MinecraftForge.EVENT_BUS.post(ExtraSupplyIdEvent(knownNames::put))
+		MinecraftForge.EVENT_BUS.post(ExtraSupplyIdEvent(::saveKnownItem))
 	}
 
 	@SubscribeEvent(priority = EventPriority.HIGH)
@@ -63,7 +71,7 @@ class ItemIdProvider {
 		name = name.trim()
 		val id = stack.getInternalId()
 		if (id != null && name.isNotBlank()) {
-			knownNames[name] = id
+			saveKnownItem(name, id)
 		}
 	}
 
@@ -84,7 +92,7 @@ class ItemIdProvider {
 
 	// TODO: make use of colour
 	fun findForName(name: String, fallbackToGenerated: Boolean = true): ItemId? {
-		var id = knownNames[name]
+		var id = knownNames[createLookupTagFromDisplayName(name)]
 		if (id == null && fallbackToGenerated) {
 			id = generateName(name)
 		}

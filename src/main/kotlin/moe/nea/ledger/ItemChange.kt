@@ -59,6 +59,7 @@ data class ItemChange(
 		}
 
 		fun unpairGain(pair: Pair<ItemId, Double>) = unpair(ChangeDirection.GAINED, pair)
+		fun unpairLose(pair: Pair<ItemId, Double>) = unpair(ChangeDirection.LOST, pair)
 
 		fun gain(itemId: ItemId, amount: Number): ItemChange {
 			return ItemChange(itemId, amount.toDouble(), ChangeDirection.GAINED)
