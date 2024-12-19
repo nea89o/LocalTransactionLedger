@@ -87,13 +87,13 @@ class Ledger {
 		fun runLater(runnable: Runnable) {
 			tickQueue.add(runnable)
 		}
+		val di = DI()
 	}
 
 	@Mod.EventHandler
 	fun init(event: FMLInitializationEvent) {
 		logger.info("Initializing ledger")
 
-		val di = DI()
 		TelemetryProvider.setupFor(di)
 		di.registerSingleton(this)
 		di.registerSingleton(Minecraft.getMinecraft())

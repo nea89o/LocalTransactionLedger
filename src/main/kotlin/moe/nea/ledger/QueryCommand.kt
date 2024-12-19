@@ -9,6 +9,7 @@ import moe.nea.ledger.database.Database
 import moe.nea.ledger.utils.di.Inject
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
+import net.minecraft.util.BlockPos
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ChatStyle
 import net.minecraft.util.EnumChatFormatting
@@ -65,6 +66,18 @@ class QueryCommand : CommandBase() {
 			is ParseResult.MissingArg -> {
 				logger.printOut("§cFilter ${p.filterM.name} is missing an argument.")
 			}
+		}
+	}
+
+	override fun addTabCompletionOptions(
+		sender: ICommandSender,
+		args: Array<out String>,
+		pos: BlockPos
+	): MutableList<String>? {
+		when (val p = parseArgs(args)) {
+			is ParseResult.MissingArg -> return null
+			is ParseResult.Success -> return p.lastFilterM.tabComplete(args.last())
+			is ParseResult.UnknownFilter -> return getListOfStringsMatchingLastWord(args, mFilters.keys)
 		}
 	}
 
@@ -148,20 +161,35 @@ class QueryCommand : CommandBase() {
 			val preparedText = "%" + text.trim('%') + "%"
 			return Clause { column(DBLogEntry.type) like preparedText }
 		}
+
+		override fun tabComplete(partialArg: String): MutableList<String> {
+			return TransactionType.entries.asSequence().map { it.name }.filter { partialArg in it }.toMutableList()
+		}
 	}
 
 	object ItemFilter : FilterM {
 		override val name: String
 			get() = "withitem"
 
+		private val itemIdProvider = Ledger.di.provide<ItemIdProvider>() // TODO: close this escape hatch
 		override fun getFilter(text: String): BooleanExpression {
 			return Clause { column(DBItemEntry.itemId) like text }
+		}
+
+		override fun tabComplete(partialArg: String): MutableList<String>? {
+			return itemIdProvider.getKnownItemIds()
+				.asSequence()
+				.map { it.string }
+				.filter { partialArg in it }
+				.take(100)
+				.toMutableList()
 		}
 	}
 
 	interface FilterM {
 		val name: String
 		fun getFilter(text: String): BooleanExpression
+		fun tabComplete(partialArg: String): MutableList<String>?
 //		fun tabCompleteFilter() TODO
 	}
 

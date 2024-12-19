@@ -137,7 +137,7 @@ class ItemIdProvider {
 						ItemId("SKYBLOCK_POWDER_${generateName(it).string}")
 					} ?: id.ifDropLast(" Essence") {
 						ItemId("ESSENCE_${generateName(it).string}")
-					}  ?: generateName(id)
+					} ?: generateName(id)
 				}
 			}
 			return Pair(id, parseShortNumber(group("amount")))
@@ -154,5 +154,9 @@ class ItemIdProvider {
 			}
 		}
 		return findForName(properName, fallbackToGenerated)?.let { Pair(it, 1.0) }
+	}
+
+	fun getKnownItemIds(): Collection<ItemId> {
+		return knownNames.values
 	}
 }
