@@ -16,6 +16,7 @@ import moe.nea.ledger.modules.BitsDetection
 import moe.nea.ledger.modules.BitsShopDetection
 import moe.nea.ledger.modules.DungeonChestDetection
 import moe.nea.ledger.modules.ExternalDataProvider
+import moe.nea.ledger.modules.ForgeDetection
 import moe.nea.ledger.modules.GambleDetection
 import moe.nea.ledger.modules.KatDetection
 import moe.nea.ledger.modules.KuudraChestDetection
@@ -87,6 +88,7 @@ class Ledger {
 		fun runLater(runnable: Runnable) {
 			tickQueue.add(runnable)
 		}
+
 		val di = DI()
 	}
 
@@ -118,6 +120,7 @@ class Ledger {
 			LogChatCommand::class.java,
 			MinionDetection::class.java,
 			MineshaftCorpseDetection::class.java,
+			ForgeDetection::class.java,
 			NpcDetection::class.java,
 			GambleDetection::class.java,
 			QueryCommand::class.java,
