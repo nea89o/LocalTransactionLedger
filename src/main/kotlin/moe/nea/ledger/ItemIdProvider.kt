@@ -86,9 +86,13 @@ class ItemIdProvider {
 	fun findForName(name: String, fallbackToGenerated: Boolean = true): ItemId? {
 		var id = knownNames[name]
 		if (id == null && fallbackToGenerated) {
-			id = ItemId(name.uppercase().replace(" ", "_"))
+			id = generateName(name)
 		}
 		return id
+	}
+
+	fun generateName(name: String): ItemId {
+		return ItemId(name.uppercase().replace(" ", "_"))
 	}
 
 	private val coinRegex = "(?<amount>$SHORT_NUMBER_PATTERN) Coins?".toPattern()
@@ -103,13 +107,40 @@ class ItemIdProvider {
 			.toList()
 	}
 
+	private val etherialRewardPattern = "\\+(?<amount>${SHORT_NUMBER_PATTERN})x? (?<what>.*)".toPattern()
+
 	fun findStackableItemByName(name: String, fallbackToGenerated: Boolean = false): Pair<ItemId, Double>? {
-		val properName = name.unformattedString()
+		val properName = name.unformattedString().trim()
 		if (properName == "FREE" || properName == "This Chest is Free!") {
 			return Pair(ItemId.COINS, 0.0)
 		}
 		coinRegex.useMatcher(properName) {
 			return Pair(ItemId.COINS, parseShortNumber(group("amount")))
+		}
+		etherialRewardPattern.useMatcher(properName) {
+			val id = when (val id = group("what")) {
+				"Copper" -> ItemId.COPPER
+				"Bits" -> ItemId.BITS
+				"Garden Experience" -> ItemId.GARDEN
+				"Farming XP" -> ItemId.FARMING
+				"Gold Essence" -> ItemId.GOLD_ESSENCE
+				"Gemstone Powder" -> ItemId.GEMSTONE_POWDER
+				"Mithril Powder" -> ItemId.MITHRIL_POWDER
+				"Pelts" -> ItemId.PELT
+				"Fine Flour" -> ItemId.FINE_FLOUR
+				else -> {
+					id.ifDropLast(" Experience") {
+						ItemId.skill(generateName(it).string)
+					} ?: id.ifDropLast(" XP") {
+						ItemId.skill(generateName(it).string)
+					} ?: id.ifDropLast(" Powder") {
+						ItemId("SKYBLOCK_POWDER_${generateName(it).string}")
+					} ?: id.ifDropLast(" Essence") {
+						ItemId("ESSENCE_${generateName(it).string}")
+					}  ?: generateName(id)
+				}
+			}
+			return Pair(id, parseShortNumber(group("amount")))
 		}
 		essenceRegex.useMatcher(properName) {
 			return Pair(ItemId("ESSENCE_${group("essence").uppercase()}"),

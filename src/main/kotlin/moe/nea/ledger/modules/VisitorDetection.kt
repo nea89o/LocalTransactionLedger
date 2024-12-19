@@ -59,29 +59,7 @@ class VisitorDetection {
 
 	private fun parseGardenLoreLine(rewardLine: String): Pair<ItemId, Double>? {
 		val f = rewardLine.unformattedString().trim()
-		return parseSpecialReward(f)
-			?: idProvider.findStackableItemByName(f, true)
-	}
-
-	private val specialRewardRegex = "\\+(?<amount>${SHORT_NUMBER_PATTERN})x? (?<what>.*)".toPattern()
-
-	private fun parseSpecialReward(specialLine: String): Pair<ItemId, Double>? {
-		specialRewardRegex.useMatcher(specialLine) {
-			val id = when (group("what")) {
-				"Copper" -> ItemId.COPPER
-				"Bits" -> ItemId.BITS
-				"Garden Experience" -> ItemId.GARDEN
-				"Farming XP" -> ItemId.FARMING
-				"Gold Essence" -> ItemId.GOLD_ESSENCE
-				"Gemstone Powder" -> ItemId.GEMSTONE_POWDER
-				"Mithril Powder" -> ItemId.MITHRIL_POWDER
-				"Pelts" -> ItemId.PELT
-				"Fine Flour" -> ItemId.FINE_FLOUR
-				else -> ItemId.NIL
-			}
-			return Pair(id, parseShortNumber(group("amount")))
-		}
-		return null
+		return idProvider.findStackableItemByName(f, true)
 	}
 
 

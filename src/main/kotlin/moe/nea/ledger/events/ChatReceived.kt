@@ -10,6 +10,6 @@ data class ChatReceived(
     val timestamp: Instant = Instant.now()
 ) : Event() {
     constructor(event: ClientChatReceivedEvent) : this(
-        event.message.unformattedText.unformattedString()
+        event.message.unformattedText.unformattedString().trimEnd()
     )
 }

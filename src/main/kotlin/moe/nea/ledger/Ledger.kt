@@ -18,6 +18,7 @@ import moe.nea.ledger.modules.DungeonChestDetection
 import moe.nea.ledger.modules.ExternalDataProvider
 import moe.nea.ledger.modules.KatDetection
 import moe.nea.ledger.modules.KuudraChestDetection
+import moe.nea.ledger.modules.MineshaftCorpseDetection
 import moe.nea.ledger.modules.MinionDetection
 import moe.nea.ledger.modules.NpcDetection
 import moe.nea.ledger.modules.VisitorDetection
@@ -115,6 +116,7 @@ class Ledger {
 			LedgerLogger::class.java,
 			LogChatCommand::class.java,
 			MinionDetection::class.java,
+			MineshaftCorpseDetection::class.java,
 			NpcDetection::class.java,
 			QueryCommand::class.java,
 			RequestUtil::class.java,

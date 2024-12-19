@@ -75,8 +75,16 @@ fun parseShortNumber(string: String): Double {
 	return k.toDouble() * scalarMultiplier
 }
 
+fun Pattern.matches(string: String): Boolean = matcher(string).matches()
 inline fun <T> Pattern.useMatcher(string: String, block: Matcher.() -> T): T? =
 	matcher(string).takeIf { it.matches() }?.let(block)
+
+fun <T> String.ifDropLast(suffix: String, block: (String) -> T): T? {
+	if (endsWith(suffix)) {
+		return block(dropLast(suffix.length))
+	}
+	return null
+}
 
 fun String.unformattedString(): String = replace("§.".toRegex(), "")
 
