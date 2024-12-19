@@ -79,9 +79,13 @@ class QueryCommand : CommandBase() {
 			query.where(ANDExpression(value))
 		}
 		query.limit(80u)
+		val dedup = mutableSetOf<UUIDUtil.ULIDWrapper>()
 		query.forEach {
 			val type = it[DBLogEntry.type]
 			val transactionId = it[DBLogEntry.transactionId]
+			if (!dedup.add(transactionId)) {
+				return@forEach
+			}
 			val timestamp = transactionId.getTimestamp()
 			val items = DBItemEntry.selectAll(database.connection)
 				.where(Clause { column(DBItemEntry.transactionId) eq string(transactionId.wrapped) })
