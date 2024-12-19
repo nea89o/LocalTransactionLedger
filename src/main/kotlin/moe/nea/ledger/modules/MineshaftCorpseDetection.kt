@@ -10,6 +10,7 @@ import moe.nea.ledger.events.ChatReceived
 import moe.nea.ledger.matches
 import moe.nea.ledger.useMatcher
 import moe.nea.ledger.utils.BorderedTextTracker
+import moe.nea.ledger.utils.di.Inject
 
 class MineshaftCorpseDetection : BorderedTextTracker() {
 	/*
@@ -69,6 +70,10 @@ class MineshaftCorpseDetection : BorderedTextTracker() {
 	val corpseNameToKey = mapOf(
 		"LAPIS" to ItemId.NIL
 	)
+
+	@Inject
 	lateinit var logger: LedgerLogger
+
+	@Inject
 	lateinit var itemIdProvider: ItemIdProvider
 }
