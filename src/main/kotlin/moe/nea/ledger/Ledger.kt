@@ -16,6 +16,7 @@ import moe.nea.ledger.modules.BitsDetection
 import moe.nea.ledger.modules.BitsShopDetection
 import moe.nea.ledger.modules.DungeonChestDetection
 import moe.nea.ledger.modules.ExternalDataProvider
+import moe.nea.ledger.modules.EyedropsDetection
 import moe.nea.ledger.modules.ForgeDetection
 import moe.nea.ledger.modules.GambleDetection
 import moe.nea.ledger.modules.KatDetection
@@ -105,24 +106,25 @@ class Ledger {
 			BankDetection::class.java,
 			BazaarDetection::class.java,
 			BazaarOrderDetection::class.java,
-			DebugDataCommand::class.java,
 			BitsDetection::class.java,
 			BitsShopDetection::class.java,
 			ConfigCommand::class.java,
 			Database::class.java,
+			DebugDataCommand::class.java,
 			DungeonChestDetection::class.java,
 			ErrorUtil::class.java,
 			ExternalDataProvider::class.java,
+			EyedropsDetection::class.java,
+			ForgeDetection::class.java,
+			GambleDetection::class.java,
 			ItemIdProvider::class.java,
 			KatDetection::class.java,
 			KuudraChestDetection::class.java,
 			LedgerLogger::class.java,
 			LogChatCommand::class.java,
-			MinionDetection::class.java,
 			MineshaftCorpseDetection::class.java,
-			ForgeDetection::class.java,
+			MinionDetection::class.java,
 			NpcDetection::class.java,
-			GambleDetection::class.java,
 			QueryCommand::class.java,
 			RequestUtil::class.java,
 			VisitorDetection::class.java,
