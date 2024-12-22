@@ -1,29 +1,57 @@
 name: Run Gradle Build
 on:
-  - push
-  - pull_request
+    - push
+    - pull_request
 
 jobs:
-  gradle:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout source
-        uses: actions/checkout@v4.1.1
+    gradle:
+        runs-on: ubuntu-latest
+        steps:
+            -   name: Checkout source
+                uses: actions/checkout@v4.1.1
 
-      - name: Setup Java
-        uses: actions/setup-java@v4.0.0
-        with:
-          distribution: temurin
-          java-version: 17
+            -   name: Setup Java
+                uses: actions/setup-java@v4.0.0
+                with:
+                    distribution: temurin
+                    java-version: 17
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+            -   name: Setup Gradle
+                uses: gradle/actions/setup-gradle@v3
 
-      - name: Execute Gradle build
-        run: ./gradlew build
+            -   name: Execute Gradle build
+                run: ./gradlew build
 
-      - name: Upload built mod JAR
-        uses: actions/upload-artifact@v4.3.0
-        with:
-          name: mod-jar
-          path: build/libs/*.jar
+            -   name: Upload built mod JAR
+                uses: actions/upload-artifact@v4.3.0
+                with:
+                    name: mod-jar
+                    path: build/libs/*.jar
+    release:
+        runs-on: ubuntu-latest
+        needs: gradle
+        permissions: write-all
+        if: ${{ 'push' == github.event_name && 'master' == github.ref_name && '758196864' == github.repository_id }}
+        steps:
+            -   name: Set repository context
+                uses: actions/checkout@v4
+            -   name: Download artifact
+                uses: actions/download-artifact@v4
+                with:
+                    name: mod-jar
+            -   name: Update release
+                run: |
+                    echo Deleting all existing nightly assets
+                    gh release view nightly --json assets \
+                    | jq '.assets[]|.name' -r \
+                    | while IFS= read -r name;
+                    do
+                        gh release delete-asset -y -- nightly "$name";
+                    done
+                    echo Pushing current commit to nightly ref
+                    git tag -f nightly
+                    git push -f origin nightly
+                    echo Upload release
+                    gh release upload nightly -- "$(echo *.jar)"
+                env:
+                    GH_TOKEN: ${{ github.token }}
