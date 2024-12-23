@@ -18,7 +18,7 @@ fun cmd(vararg args: String): String {
 		standardOutput = baos
 		commandLine(*args)
 	}
-		return baos.toByteArray().decodeToString().trim()
+	return baos.toByteArray().decodeToString().trim()
 }
 
 
@@ -76,6 +76,7 @@ sourceSets.main {
 
 repositories {
 	mavenCentral()
+	maven("https://repo.nea.moe/releases/")
 	maven("https://repo.spongepowered.org/maven/")
 	maven("https://maven.notenoughupdates.org/releases")
 	maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
@@ -100,6 +101,7 @@ dependencies {
 	shadowImpl("org.xerial:sqlite-jdbc:3.45.3.0")
 	shadowImpl("org.notenoughupdates.moulconfig:legacy:3.0.0-beta.9")
 	shadowImpl("io.azam.ulidj:ulidj:1.0.4")
+	shadowImpl("moe.nea:libautoupdate:1.3.1")
 	runtimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.1.2")
 	testImplementation("org.junit.jupiter:junit-jupiter:5.9.2")
 }
@@ -155,6 +157,7 @@ tasks.shadowJar {
 	destinationDirectory.set(layout.buildDirectory.dir("badjars"))
 	archiveClassifier.set("all-dev")
 	configurations = listOf(shadowImpl)
+	relocate("moe.nea.libautoupdate", "moe.nea.ledger.deps.libautoupdate")
 	mergeServiceFiles()
 }
 

@@ -41,6 +41,13 @@ jobs:
                     name: mod-jar
             -   name: Update release
                 run: |
+                    echo Generating notes
+                    (
+                        echo "Automatically generated nightly release. This release is updated on each new commit"
+                        echo
+                        echo Generated from commit: \`$(git rev-parse HEAD)\`
+                    )> release-notes.md
+                    cat release-notes.md
                     echo Deleting all existing nightly assets
                     gh release view nightly --json assets \
                     | jq '.assets[]|.name' -r \
@@ -53,5 +60,6 @@ jobs:
                     git push -f origin nightly
                     echo Upload release
                     gh release upload nightly -- "$(echo *.jar)"
+                    gh release edit nightly -F release-notes.md
                 env:
                     GH_TOKEN: ${{ github.token }}

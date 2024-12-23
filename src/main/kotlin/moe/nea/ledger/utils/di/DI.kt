@@ -9,25 +9,32 @@ class DI {
 	private fun formatInjectionStack() =
 		injectionStack.joinToString(" -> ")
 
+	fun <T : Any> getProvider(type: Class<T>): BaseDIProvider<T, *> {
+		val provider = providers[type] as BaseDIProvider<T, *>?
+			?: error("Could not find provider for type $type")
+		return provider
+	}
+
 	private fun <T : Any, C> internalProvide(type: Class<T>, element: AnnotatedElement? = null): T {
-		val provider = providers[type] as BaseDIProvider<T, C>
-		val context = if (element == null) provider.createEmptyContext() else provider.createContext(element)
-		val key = Pair(type, context)
-		val existingValue = values[key]
-		if (existingValue != null) return existingValue as T
-		if (type in injectionStack) {
-			error("Found injection cycle: ${formatInjectionStack()} -> $type")
-		}
-		injectionStack.push(type)
-		val value = try {
-			provider.provideWithContext(this, context)
+		try {
+			val provider = getProvider(type) as BaseDIProvider<T, C>
+			val context = if (element == null) provider.createEmptyContext() else provider.createContext(element)
+			val key = Pair(type, context)
+			val existingValue = values[key]
+			if (existingValue != null) return existingValue as T
+			if (type in injectionStack) {
+				error("Found injection cycle: ${formatInjectionStack()} -> $type")
+			}
+			injectionStack.push(type)
+			val value =
+				provider.provideWithContext(this, context)
+			val cycleCheckCookie = injectionStack.pop()
+			require(cycleCheckCookie == type) { "Unbalanced stack cookie: $cycleCheckCookie != $type" }
+			values[key] = value
+			return value
 		} catch (ex: Exception) {
 			throw RuntimeException("Could not create instance for type $type (in stack ${formatInjectionStack()})", ex)
 		}
-		val cycleCheckCookie = injectionStack.pop()
-		require(cycleCheckCookie == type) { "Unbalanced stack cookie: $cycleCheckCookie != $type" }
-		values[key] = value
-		return value
 	}
 
 	fun <T : Any> provide(type: Class<T>, element: AnnotatedElement? = null): T {

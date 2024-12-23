@@ -3,6 +3,8 @@ package moe.nea.ledger
 import com.google.gson.Gson
 import io.github.notenoughupdates.moulconfig.managed.ManagedConfig
 import moe.nea.ledger.config.LedgerConfig
+import moe.nea.ledger.config.UpdateUi
+import moe.nea.ledger.config.UpdateUiMarker
 import moe.nea.ledger.database.Database
 import moe.nea.ledger.events.ChatReceived
 import moe.nea.ledger.events.LateWorldLoadEvent
@@ -23,9 +25,12 @@ import moe.nea.ledger.modules.KuudraChestDetection
 import moe.nea.ledger.modules.MineshaftCorpseDetection
 import moe.nea.ledger.modules.MinionDetection
 import moe.nea.ledger.modules.NpcDetection
+import moe.nea.ledger.modules.UpdateChecker
 import moe.nea.ledger.modules.VisitorDetection
 import moe.nea.ledger.utils.ErrorUtil
+import moe.nea.ledger.utils.MinecraftExecutor
 import moe.nea.ledger.utils.di.DI
+import moe.nea.ledger.utils.di.DIProvider
 import moe.nea.ledger.utils.network.RequestUtil
 import net.minecraft.client.Minecraft
 import net.minecraft.command.ICommand
@@ -82,6 +87,9 @@ class Ledger {
 		val logger = LogManager.getLogger("MoneyLedger")
 		val managedConfig = ManagedConfig.create(File("config/money-ledger/config.json"), LedgerConfig::class.java) {
 			checkExpose = false
+			customProcessor<UpdateUiMarker> { option, ann ->
+				UpdateUi(option)
+			}
 		}
 		val gson = Gson()
 		private val tickQueue = ConcurrentLinkedQueue<Runnable>()
@@ -100,6 +108,7 @@ class Ledger {
 		di.registerSingleton(this)
 		di.registerSingleton(Minecraft.getMinecraft())
 		di.registerSingleton(gson)
+		di.register(LedgerConfig::class.java, DIProvider { managedConfig.instance })
 		di.registerInjectableClasses(
 			AuctionHouseDetection::class.java,
 			BankDetection::class.java,
@@ -123,6 +132,9 @@ class Ledger {
 			ForgeDetection::class.java,
 			NpcDetection::class.java,
 			GambleDetection::class.java,
+			MinecraftExecutor::class.java,
+			UpdateChecker::class.java,
+			TriggerCommand::class.java,
 			QueryCommand::class.java,
 			RequestUtil::class.java,
 			VisitorDetection::class.java,
