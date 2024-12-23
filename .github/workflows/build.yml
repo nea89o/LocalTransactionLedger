@@ -32,6 +32,9 @@ jobs:
         needs: gradle
         permissions: write-all
         if: ${{ 'push' == github.event_name && 'master' == github.ref_name && '758196864' == github.repository_id }}
+        concurrency:
+            cancel-in-progress: true
+            group: nightly-release
         steps:
             -   name: Set repository context
                 uses: actions/checkout@v4

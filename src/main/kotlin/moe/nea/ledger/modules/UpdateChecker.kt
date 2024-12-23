@@ -1,5 +1,6 @@
 package moe.nea.ledger.modules
 
+import com.google.gson.JsonElement
 import com.google.gson.JsonPrimitive
 import moe.nea.ledger.DevUtil
 import moe.nea.ledger.LedgerLogger
@@ -38,7 +39,25 @@ class UpdateChecker @Inject constructor(
 		NightlyAwareGithubUpdateSource("nea89o", "LocalTransactionLedger"),
 		if (DevUtil.isDevEnv) UpdateTarget { listOf() }
 		else UpdateTarget.deleteAndSaveInTheSameFolder(UpdateChecker::class.java),
-		CurrentVersion.ofTag(BuildConfig.GIT_COMMIT),
+		object : CurrentVersion {
+			override fun display(): String {
+				return BuildConfig.VERSION
+			}
+
+			override fun isOlderThan(element: JsonElement?): Boolean {
+				if (element !is JsonPrimitive || !element.isString) return true
+				val newHash = element.asString // TODO: change once i support non nightly update streams
+				val length = minOf(newHash.length, BuildConfig.GIT_COMMIT.length)
+				if (newHash.substring(0, length).equals(BuildConfig.GIT_COMMIT.substring(0, length), ignoreCase = true))
+					return false
+				return true
+			}
+
+
+			override fun toString(): String {
+				return "{gitversion:${BuildConfig.GIT_COMMIT}, version:${BuildConfig.FULL_VERSION}}"
+			}
+		},
 		"ledger"
 	)
 
@@ -112,7 +131,6 @@ class UpdateChecker @Inject constructor(
 	fun informAboutUpdates(potentialUpdate: PotentialUpdate) {
 		if (hasNotified) return
 		hasNotified = true
-//		logger.printOut("Update: ${potentialUpdate}")
 		if (!potentialUpdate.isUpdateAvailable) return
 		logger.printOut(
 			ChatComponentText("§aThere is a new update for LocalTransactionLedger. Click here to automatically download and install it.")
