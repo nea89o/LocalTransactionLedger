@@ -4,6 +4,7 @@ import moe.nea.ledger.utils.di.Inject
 import moe.nea.ledger.utils.telemetry.ContextValue
 import moe.nea.ledger.utils.telemetry.EventRecorder
 import moe.nea.ledger.utils.telemetry.Span
+import java.util.concurrent.CompletableFuture
 
 class ErrorUtil {
 
@@ -25,6 +26,14 @@ class ErrorUtil {
 			report(exc, null)
 		}
 		return getOrNull()
+	}
+
+	fun <T : CompletableFuture<*>> listenToFuture(t: T): T {
+		t.handle { ignored, exception ->
+			if (exception != null)
+				report(exception, "Uncaught exception in completable future")
+		}
+		return t
 	}
 
 	inline fun <T> catch(

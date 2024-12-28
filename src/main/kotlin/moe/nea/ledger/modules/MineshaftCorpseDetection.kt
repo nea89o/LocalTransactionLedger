@@ -39,7 +39,6 @@ class MineshaftCorpseDetection : BorderedTextTracker() {
 	}
 
 	override fun onBorderedTextFinished(enclosed: List<ChatReceived>) {
-		// TODO: test this once profile swapping has been re-enabled
 		val rewards = enclosed.asSequence()
 			.dropWhile { it.message != "  REWARDS" }
 			.drop(1)
@@ -68,7 +67,10 @@ class MineshaftCorpseDetection : BorderedTextTracker() {
 	}
 
 	val corpseNameToKey = mapOf(
-		"LAPIS" to ItemId.NIL
+		"LAPIS" to ItemId.NIL,
+		"VANGUARD" to ItemId("SKELETON_KEY"),
+		"UMBER" to ItemId("UMBER_KEY"),
+		"TUNGSTEN" to ItemId("TUNGSTEN_KEY"),
 	)
 
 	@Inject

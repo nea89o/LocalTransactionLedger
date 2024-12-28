@@ -10,6 +10,7 @@ import moe.nea.ledger.TransactionType
 import moe.nea.ledger.asIterable
 import moe.nea.ledger.events.BeforeGuiAction
 import moe.nea.ledger.events.ChatReceived
+import moe.nea.ledger.events.ExtraSupplyIdEvent
 import moe.nea.ledger.getDisplayNameU
 import moe.nea.ledger.getInternalId
 import moe.nea.ledger.getLore
@@ -44,6 +45,11 @@ class NpcDetection @Inject constructor(val ledger: LedgerLogger, val ids: ItemId
 				val cost = ids.findCostItemsFromSpan(it.getLore())
 				storedPurchases[name] = listOf(ItemChange.gain(id, count)) + cost.map { ItemChange.unpairLose(it) }
 			}
+	}
+
+	@SubscribeEvent
+	fun addChocolate(event: ExtraSupplyIdEvent) {
+		event.store("Chocolate", ItemId("SKYBLOCK_CHOCOLATE"))
 	}
 
 	@Inject

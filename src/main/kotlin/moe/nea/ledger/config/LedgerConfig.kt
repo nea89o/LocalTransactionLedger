@@ -20,6 +20,10 @@ class LedgerConfig : Config() {
 		return DescriptionRendereringBehaviour.EXPAND_PANEL
 	}
 
+	@Category(name = "Ledger", desc = "")
+	@JvmField
+	val main = MainOptions()
+
 	@Category(name = "Synchronization", desc = "")
 	@JvmField
 	val synchronization = SynchronizationOptions()

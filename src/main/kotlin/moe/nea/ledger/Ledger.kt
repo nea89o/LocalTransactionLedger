@@ -3,10 +3,13 @@ package moe.nea.ledger
 import com.google.gson.Gson
 import io.github.notenoughupdates.moulconfig.managed.ManagedConfig
 import moe.nea.ledger.config.LedgerConfig
+import moe.nea.ledger.config.UpdateUi
+import moe.nea.ledger.config.UpdateUiMarker
 import moe.nea.ledger.database.Database
 import moe.nea.ledger.events.ChatReceived
 import moe.nea.ledger.events.LateWorldLoadEvent
 import moe.nea.ledger.events.RegistrationFinishedEvent
+import moe.nea.ledger.events.WorldSwitchEvent
 import moe.nea.ledger.gen.BuildConfig
 import moe.nea.ledger.modules.AuctionHouseDetection
 import moe.nea.ledger.modules.BankDetection
@@ -14,6 +17,8 @@ import moe.nea.ledger.modules.BazaarDetection
 import moe.nea.ledger.modules.BazaarOrderDetection
 import moe.nea.ledger.modules.BitsDetection
 import moe.nea.ledger.modules.BitsShopDetection
+import moe.nea.ledger.modules.DragonEyePlacementDetection
+import moe.nea.ledger.modules.`DragonSacrificeDetection`
 import moe.nea.ledger.modules.DungeonChestDetection
 import moe.nea.ledger.modules.ExternalDataProvider
 import moe.nea.ledger.modules.EyedropsDetection
@@ -24,9 +29,12 @@ import moe.nea.ledger.modules.KuudraChestDetection
 import moe.nea.ledger.modules.MineshaftCorpseDetection
 import moe.nea.ledger.modules.MinionDetection
 import moe.nea.ledger.modules.NpcDetection
+import moe.nea.ledger.modules.UpdateChecker
 import moe.nea.ledger.modules.VisitorDetection
 import moe.nea.ledger.utils.ErrorUtil
+import moe.nea.ledger.utils.MinecraftExecutor
 import moe.nea.ledger.utils.di.DI
+import moe.nea.ledger.utils.di.DIProvider
 import moe.nea.ledger.utils.network.RequestUtil
 import net.minecraft.client.Minecraft
 import net.minecraft.command.ICommand
@@ -83,6 +91,9 @@ class Ledger {
 		val logger = LogManager.getLogger("MoneyLedger")
 		val managedConfig = ManagedConfig.create(File("config/money-ledger/config.json"), LedgerConfig::class.java) {
 			checkExpose = false
+			customProcessor<UpdateUiMarker> { option, ann ->
+				UpdateUi(option)
+			}
 		}
 		val gson = Gson()
 		private val tickQueue = ConcurrentLinkedQueue<Runnable>()
@@ -101,6 +112,7 @@ class Ledger {
 		di.registerSingleton(this)
 		di.registerSingleton(Minecraft.getMinecraft())
 		di.registerSingleton(gson)
+		di.register(LedgerConfig::class.java, DIProvider { managedConfig.instance })
 		di.registerInjectableClasses(
 			AuctionHouseDetection::class.java,
 			BankDetection::class.java,
@@ -111,6 +123,8 @@ class Ledger {
 			ConfigCommand::class.java,
 			Database::class.java,
 			DebugDataCommand::class.java,
+			DragonEyePlacementDetection::class.java,
+			DragonSacrificeDetection::class.java,
 			DungeonChestDetection::class.java,
 			ErrorUtil::class.java,
 			ExternalDataProvider::class.java,
@@ -122,11 +136,14 @@ class Ledger {
 			KuudraChestDetection::class.java,
 			LedgerLogger::class.java,
 			LogChatCommand::class.java,
+			MinecraftExecutor::class.java,
 			MineshaftCorpseDetection::class.java,
 			MinionDetection::class.java,
 			NpcDetection::class.java,
 			QueryCommand::class.java,
 			RequestUtil::class.java,
+			TriggerCommand::class.java,
+			UpdateChecker::class.java,
 			VisitorDetection::class.java,
 		)
 		val errorUtil = di.provide<ErrorUtil>()
@@ -150,6 +167,7 @@ class Ledger {
 	fun worldSwitchEvent(event: EntityJoinWorldEvent) {
 		if (event.entity == Minecraft.getMinecraft().thePlayer) {
 			lastJoin = System.currentTimeMillis()
+			MinecraftForge.EVENT_BUS.post(WorldSwitchEvent())
 		}
 	}
 

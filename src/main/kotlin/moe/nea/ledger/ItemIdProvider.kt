@@ -105,7 +105,9 @@ class ItemIdProvider {
 
 	private val coinRegex = "(?<amount>$SHORT_NUMBER_PATTERN) Coins?".toPattern()
 	private val stackedItemRegex = "(?<name>.*) x(?<count>$SHORT_NUMBER_PATTERN)".toPattern()
+	private val reverseStackedItemRegex = "(?<count>$SHORT_NUMBER_PATTERN)x (?<name>.*)".toPattern()
 	private val essenceRegex = "(?<essence>.*) Essence x(?<count>$SHORT_NUMBER_PATTERN)".toPattern()
+	private val numberedItemRegex = "(?<count>$SHORT_NUMBER_PATTERN) (?<what>.*)".toPattern()
 
 	fun findCostItemsFromSpan(lore: List<String>): List<Pair<ItemId, Double>> {
 		return lore.iterator().asSequence()
@@ -155,12 +157,27 @@ class ItemIdProvider {
 			            parseShortNumber(group("count")))
 		}
 		stackedItemRegex.useMatcher(properName) {
-			var item = findForName(group("name"), fallbackToGenerated)
+			val item = findForName(group("name"), fallbackToGenerated)
 			if (item != null) {
 				val count = parseShortNumber(group("count"))
 				return Pair(item, count)
 			}
 		}
+		reverseStackedItemRegex.useMatcher(properName) {
+			val item = findForName(group("name"), fallbackToGenerated)
+			if (item != null) {
+				val count = parseShortNumber(group("count"))
+				return Pair(item, count)
+			}
+		}
+		numberedItemRegex.useMatcher(properName) {
+			val item = findForName(group("what"), fallbackToGenerated)
+			if (item != null) {
+				val count = parseShortNumber(group("count"))
+				return Pair(item, count)
+			}
+		}
+
 		return findForName(properName, fallbackToGenerated)?.let { Pair(it, 1.0) }
 	}
 
