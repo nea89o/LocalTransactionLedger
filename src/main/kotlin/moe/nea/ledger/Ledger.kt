@@ -9,6 +9,7 @@ import moe.nea.ledger.database.Database
 import moe.nea.ledger.events.ChatReceived
 import moe.nea.ledger.events.LateWorldLoadEvent
 import moe.nea.ledger.events.RegistrationFinishedEvent
+import moe.nea.ledger.events.WorldSwitchEvent
 import moe.nea.ledger.gen.BuildConfig
 import moe.nea.ledger.modules.AuctionHouseDetection
 import moe.nea.ledger.modules.BankDetection
@@ -16,6 +17,7 @@ import moe.nea.ledger.modules.BazaarDetection
 import moe.nea.ledger.modules.BazaarOrderDetection
 import moe.nea.ledger.modules.BitsDetection
 import moe.nea.ledger.modules.BitsShopDetection
+import moe.nea.ledger.modules.DragonEyePlacementDetection
 import moe.nea.ledger.modules.DungeonChestDetection
 import moe.nea.ledger.modules.ExternalDataProvider
 import moe.nea.ledger.modules.ForgeDetection
@@ -114,29 +116,30 @@ class Ledger {
 			BankDetection::class.java,
 			BazaarDetection::class.java,
 			BazaarOrderDetection::class.java,
-			DebugDataCommand::class.java,
 			BitsDetection::class.java,
 			BitsShopDetection::class.java,
 			ConfigCommand::class.java,
 			Database::class.java,
+			DebugDataCommand::class.java,
+			DragonEyePlacementDetection::class.java,
 			DungeonChestDetection::class.java,
 			ErrorUtil::class.java,
 			ExternalDataProvider::class.java,
+			ForgeDetection::class.java,
+			GambleDetection::class.java,
 			ItemIdProvider::class.java,
 			KatDetection::class.java,
 			KuudraChestDetection::class.java,
 			LedgerLogger::class.java,
 			LogChatCommand::class.java,
-			MinionDetection::class.java,
-			MineshaftCorpseDetection::class.java,
-			ForgeDetection::class.java,
-			NpcDetection::class.java,
-			GambleDetection::class.java,
 			MinecraftExecutor::class.java,
-			UpdateChecker::class.java,
-			TriggerCommand::class.java,
+			MineshaftCorpseDetection::class.java,
+			MinionDetection::class.java,
+			NpcDetection::class.java,
 			QueryCommand::class.java,
 			RequestUtil::class.java,
+			TriggerCommand::class.java,
+			UpdateChecker::class.java,
 			VisitorDetection::class.java,
 		)
 		val errorUtil = di.provide<ErrorUtil>()
@@ -160,6 +163,7 @@ class Ledger {
 	fun worldSwitchEvent(event: EntityJoinWorldEvent) {
 		if (event.entity == Minecraft.getMinecraft().thePlayer) {
 			lastJoin = System.currentTimeMillis()
+			MinecraftForge.EVENT_BUS.post(WorldSwitchEvent())
 		}
 	}
 
