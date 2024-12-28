@@ -18,6 +18,7 @@ import moe.nea.ledger.modules.BazaarOrderDetection
 import moe.nea.ledger.modules.BitsDetection
 import moe.nea.ledger.modules.BitsShopDetection
 import moe.nea.ledger.modules.DragonEyePlacementDetection
+import moe.nea.ledger.modules.`DragonSacrificeDetection`
 import moe.nea.ledger.modules.DungeonChestDetection
 import moe.nea.ledger.modules.ExternalDataProvider
 import moe.nea.ledger.modules.ForgeDetection
@@ -122,6 +123,7 @@ class Ledger {
 			Database::class.java,
 			DebugDataCommand::class.java,
 			DragonEyePlacementDetection::class.java,
+			DragonSacrificeDetection::class.java,
 			DungeonChestDetection::class.java,
 			ErrorUtil::class.java,
 			ExternalDataProvider::class.java,

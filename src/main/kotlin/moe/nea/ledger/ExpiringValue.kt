@@ -7,8 +7,10 @@ class ExpiringValue<T>(private val value: T) {
 	val lastSeenAt: Long = System.nanoTime()
 	val age get() = (System.nanoTime() - lastSeenAt).nanoseconds
 	var taken = false
+		private set
+
 	fun get(expiry: Duration): T? {
-		return if (!taken && expiry > age) value
+		return if (!taken && age < expiry) value
 		else null
 	}
 
@@ -21,7 +23,7 @@ class ExpiringValue<T>(private val value: T) {
 		}
 	}
 
-	fun consume(expiry: Duration): T? = get(expiry).also { take() }
+	fun consume(expiry: Duration): T? = get(expiry)?.also { take() }
 	fun take() {
 		taken = true
 	}
