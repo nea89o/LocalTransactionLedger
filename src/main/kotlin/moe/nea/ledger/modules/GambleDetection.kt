@@ -6,6 +6,7 @@ import moe.nea.ledger.LedgerEntry
 import moe.nea.ledger.LedgerLogger
 import moe.nea.ledger.TransactionType
 import moe.nea.ledger.events.ChatReceived
+import moe.nea.ledger.gen.ItemIds
 import moe.nea.ledger.useMatcher
 import moe.nea.ledger.utils.di.Inject
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -33,7 +34,7 @@ class GambleDetection {
 					listOf(
 						ItemChange.lose(item, 1),
 						ItemChange.loseCoins(rollCost),
-						ItemChange.gain(ItemId.ARCHFIEND_DYE, 1),
+						ItemChange.gain(ItemIds.DYE_ARCHFIEND, 1),
 					)
 				))
 			} else if (face == "6") {

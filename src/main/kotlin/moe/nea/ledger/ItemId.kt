@@ -1,7 +1,6 @@
 package moe.nea.ledger
 
-@JvmInline
-value class ItemId(
+data class ItemId(
 	val string: String
 ) {
 	fun singleItem(): Pair<ItemId, Double> {
@@ -14,10 +13,14 @@ value class ItemId(
 
 
 	companion object {
+
+		@JvmStatic
+		fun forName(string: String) = ItemId(string)
 		fun skill(skill: String) = ItemId("SKYBLOCK_SKILL_$skill")
 
 		val GARDEN = skill("GARDEN")
 		val FARMING = skill("FARMING")
+
 
 		val ARCHFIEND_DYE = ItemId("DYE_ARCHFIEND")
 		val ARCHFIEND_HIGH_CLASS = ItemId("HIGH_CLASS_ARCHFIEND_DICE")
