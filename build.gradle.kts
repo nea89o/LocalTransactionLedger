@@ -106,6 +106,7 @@ dependencies {
 	forge("net.minecraftforge:forge:1.8.9-11.15.1.2318-1.8.9")
 
 	shadowImpl(kotlin("stdlib-jdk8"))
+	implementation("org.jspecify:jspecify:1.0.0")
 
 	shadowImpl("org.spongepowered:mixin:0.7.11-SNAPSHOT") {
 		isTransitive = false
@@ -178,6 +179,7 @@ abstract class GenerateItemIds : DefaultTask() {
 		writer.appendLine("/**")
 		writer.appendLine(" * Automatically generated {@link ItemId} list.")
 		writer.appendLine(" */")
+		writer.appendLine("@org.jspecify.annotations.NullMarked")
 		writer.appendLine("public class ItemIds {")
 		val gson = Gson()
 		for (item in items) {

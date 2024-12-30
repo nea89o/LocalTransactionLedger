@@ -9,6 +9,7 @@ import moe.nea.ledger.LedgerLogger
 import moe.nea.ledger.SHORT_NUMBER_PATTERN
 import moe.nea.ledger.TransactionType
 import moe.nea.ledger.events.ChatReceived
+import moe.nea.ledger.gen.ItemIds
 import moe.nea.ledger.parseShortNumber
 import moe.nea.ledger.useMatcher
 import moe.nea.ledger.utils.di.Inject
@@ -43,7 +44,7 @@ class DragonSacrificeDetection {
 				event.timestamp,
 				listOf(
 					ItemChange.lose(sacrifice, 1),
-					ItemChange.gain(ItemId.DRAGON_ESSENCE, lootEssence)
+					ItemChange.gain(ItemIds.ESSENCE_DRAGON, lootEssence)
 				)
 			))
 		}

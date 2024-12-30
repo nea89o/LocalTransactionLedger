@@ -4,6 +4,7 @@ import moe.nea.ledger.events.BeforeGuiAction
 import moe.nea.ledger.events.ExtraSupplyIdEvent
 import moe.nea.ledger.events.RegistrationFinishedEvent
 import moe.nea.ledger.events.SupplyDebugInfo
+import moe.nea.ledger.gen.ItemIds
 import moe.nea.ledger.modules.ExternalDataProvider
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
@@ -129,15 +130,15 @@ class ItemIdProvider {
 		}
 		etherialRewardPattern.useMatcher(properName) {
 			val id = when (val id = group("what")) {
-				"Copper" -> ItemId.COPPER
-				"Bits" -> ItemId.BITS
+				"Copper" -> ItemIds.SKYBLOCK_COPPER
+				"Bits" -> ItemIds.SKYBLOCK_BIT
 				"Garden Experience" -> ItemId.GARDEN
 				"Farming XP" -> ItemId.FARMING
-				"Gold Essence" -> ItemId.GOLD_ESSENCE
+				"Gold Essence" -> ItemIds.ESSENCE_GOLD
 				"Gemstone Powder" -> ItemId.GEMSTONE_POWDER
 				"Mithril Powder" -> ItemId.MITHRIL_POWDER
-				"Pelts" -> ItemId.PELT
-				"Fine Flour" -> ItemId.FINE_FLOUR
+				"Pelts" -> ItemIds.SKYBLOCK_PELT
+				"Fine Flour" -> ItemIds.FINE_FLOUR
 				else -> {
 					id.ifDropLast(" Experience") {
 						ItemId.skill(generateName(it).string)

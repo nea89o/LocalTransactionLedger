@@ -6,6 +6,7 @@ import moe.nea.ledger.LedgerEntry
 import moe.nea.ledger.LedgerLogger
 import moe.nea.ledger.TransactionType
 import moe.nea.ledger.events.ChatReceived
+import moe.nea.ledger.gen.ItemIds
 import moe.nea.ledger.useMatcher
 import moe.nea.ledger.utils.di.Inject
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -25,7 +26,7 @@ class EyedropsDetection {
                     TransactionType.CAPSAICIN_EYEDROPS_USED,
                     event.timestamp,
                     listOf(
-                        ItemChange.lose(ItemId.CAP_EYEDROPS, 1)
+                        ItemChange.lose(ItemIds.CAPSAICIN_EYEDROPS_NO_CHARGES, 1)
                     )
                 )
             )

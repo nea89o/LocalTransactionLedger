@@ -9,6 +9,7 @@ import moe.nea.ledger.TransactionType
 import moe.nea.ledger.events.ChatReceived
 import moe.nea.ledger.events.ExtraSupplyIdEvent
 import moe.nea.ledger.events.GuiClickEvent
+import moe.nea.ledger.gen.ItemIds
 import moe.nea.ledger.getDisplayNameU
 import moe.nea.ledger.unformattedString
 import moe.nea.ledger.useMatcher
@@ -30,7 +31,7 @@ class DungeonChestDetection @Inject constructor(val logger: LedgerLogger) : Ches
 					TransactionType.KISMET_REROLL,
 					Instant.now(),
 					listOf(
-						ItemChange.lose(ItemId.KISMET_FEATHER, 1)
+						ItemChange.lose(ItemIds.KISMET_FEATHER, 1)
 					)
 				)
 			)

@@ -8,6 +8,7 @@ import moe.nea.ledger.LedgerEntry
 import moe.nea.ledger.LedgerLogger
 import moe.nea.ledger.SHORT_NUMBER_PATTERN
 import moe.nea.ledger.TransactionType
+import moe.nea.ledger.gen.ItemIds
 import moe.nea.ledger.getInternalId
 import moe.nea.ledger.getLore
 import moe.nea.ledger.parseShortNumber
@@ -54,8 +55,8 @@ class BitsShopDetection @Inject constructor(val ledger: LedgerLogger) {
 	                TransactionType.COMMUNITY_SHOP_BUY,
 	                Instant.now(),
 	                listOf(
-						ItemChange.lose(ItemId.BITS, lastBit.bitPrice.toDouble()),
-						ItemChange.gain(lastBit.id, lastBit.stackSize)
+		                ItemChange.lose(ItemIds.SKYBLOCK_BIT, lastBit.bitPrice.toDouble()),
+		                ItemChange.gain(lastBit.id, lastBit.stackSize)
 					)
                 )
             )

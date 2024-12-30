@@ -24,7 +24,7 @@ class GambleDetection {
 	fun onChat(event: ChatReceived) {
 		dieRolled.useMatcher(event.message) {
 			val isLowClass = group("isHighClass").isNullOrBlank()
-			val item = if (isLowClass) ItemId.ARCHFIEND_LOW_CLASS else ItemId.ARCHFIEND_HIGH_CLASS
+			val item = if (isLowClass) ItemIds.ARCHFIEND_DICE else ItemIds.HIGH_CLASS_ARCHFIEND_DICE
 			val face = group("face")
 			val rollCost = if (isLowClass) 666_000.0 else 6_600_000.0
 			if (face == "7") {

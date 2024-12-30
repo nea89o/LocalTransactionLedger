@@ -9,6 +9,7 @@ import moe.nea.ledger.LedgerLogger
 import moe.nea.ledger.SHORT_NUMBER_PATTERN
 import moe.nea.ledger.ScoreboardUtil
 import moe.nea.ledger.TransactionType
+import moe.nea.ledger.gen.ItemIds
 import moe.nea.ledger.parseShortNumber
 import moe.nea.ledger.unformattedString
 import moe.nea.ledger.useMatcher
@@ -33,7 +34,7 @@ class BitsDetection @Inject constructor(val ledger: LedgerLogger) {
 	                        TransactionType.BITS_PURSE_STATUS,
 	                        Instant.now(),
 	                        listOf(
-								ItemChange(ItemId.BITS, bits.toDouble(), ItemChange.ChangeDirection.SYNC)
+								ItemChange(ItemIds.SKYBLOCK_BIT, bits.toDouble(), ItemChange.ChangeDirection.SYNC)
 							)
                         )
                     )
@@ -52,7 +53,7 @@ class BitsDetection @Inject constructor(val ledger: LedgerLogger) {
 	                TransactionType.BOOSTER_COOKIE_ATE,
                     Instant.now(),
 					listOf(
-						ItemChange.lose(ItemId.BOOSTER_COOKIE, 1)
+						ItemChange.lose(ItemIds.BOOSTER_COOKIE, 1)
 					)
                 )
             )

@@ -7,6 +7,7 @@ import moe.nea.ledger.LedgerLogger
 import moe.nea.ledger.TransactionType
 import moe.nea.ledger.events.ChatReceived
 import moe.nea.ledger.events.WorldSwitchEvent
+import moe.nea.ledger.gen.ItemIds
 import moe.nea.ledger.useMatcher
 import moe.nea.ledger.utils.di.Inject
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -34,7 +35,7 @@ class DragonEyePlacementDetection {
 				TransactionType.WYRM_EVOKED,
 				event.timestamp,
 				listOf(
-					ItemChange.lose(ItemId.SUMMONING_EYE, eyeCount)
+					ItemChange.lose(ItemIds.SUMMONING_EYE, eyeCount)
 				)
 			))
 			eyeCount = 0
