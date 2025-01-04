@@ -290,6 +290,13 @@ val shadowJar2 = tasks.register("shadowJar2", ShadowJar::class) {
 	configurations = listOf(shadowImpl)
 	relocate("moe.nea.libautoupdate", "moe.nea.ledger.deps.libautoupdate")
 	mergeServiceFiles()
+	exclude(
+		"META-INF/INDEX.LIST",
+		"META-INF/*.SF",
+		"META-INF/*.DSA",
+		"META-INF/*.RSA",
+		"module-info.class",
+	)
 }
 val remapJar by tasks.named<net.fabricmc.loom.task.RemapJarTask>("remapJar") {
 	archiveClassifier.set("")
