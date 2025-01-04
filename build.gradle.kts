@@ -1,6 +1,7 @@
 import com.github.gmazzo.buildconfig.BuildConfigExtension
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.google.gson.Gson
+import com.google.gson.JsonObject
 import org.apache.commons.lang3.SystemUtils
 import proguard.gradle.ProGuardTask
 import java.io.ByteArrayOutputStream
@@ -156,7 +157,7 @@ abstract class GenerateItemIds : DefaultTask() {
 	fun generateItemIds() {
 		val nonIdName = "[^A-Z0-9_]".toRegex()
 
-		data class Item(val id: String) {
+		data class Item(val id: String, val file: File) {
 			val javaName get() = id.replace(nonIdName, { "__" + it.value.single().code })
 		}
 
@@ -166,7 +167,7 @@ abstract class GenerateItemIds : DefaultTask() {
 			if (listFile.extension != "json") {
 				error("Unknown file $listFile")
 			}
-			items.add(Item(listFile.nameWithoutExtension))
+			items.add(Item(listFile.nameWithoutExtension, listFile))
 		}
 		items.sortedBy { it.id }
 		outputFile.parentFile.mkdirs()
@@ -183,7 +184,13 @@ abstract class GenerateItemIds : DefaultTask() {
 		writer.appendLine("public class ItemIds {")
 		val gson = Gson()
 		for (item in items) {
+			val itemJson = gson.fromJson(item.file.readText(), JsonObject::class.java)
 			writer.appendLine("\t/**")
+			writer.appendLine("\t * <table border=\"1\">")
+			writer.appendLine("\t * <tr><th>Display Name</th><td>{@code ${itemJson["displayname"].asString}}</td></tr>")
+			writer.appendLine("\t * <tr><th>Vanilla Item</th><td>{@code ${itemJson["itemid"].asString}}</td></tr>")
+			writer.appendLine("\t * <tr><th>Internal Name</th><td>{@code ${itemJson["internalname"].asString}}</td></tr>")
+			writer.appendLine("\t * </table>")
 			writer.appendLine("\t * @see <a href=${gson.toJson("https://github.com/NotEnoughUpdates/NotEnoughUpdates-REPO/blob/${repoHash.get()}/items/${item.id}.json")}>JSON definition</a>")
 			writer.appendLine("\t */")
 			writer.appendLine("\tpublic static final ItemId ${item.javaName} =" +
