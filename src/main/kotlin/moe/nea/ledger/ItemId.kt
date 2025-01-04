@@ -1,12 +1,16 @@
 package moe.nea.ledger
 
+import moe.nea.ledger.utils.NoSideEffects
+
 data class ItemId(
 	val string: String
 ) {
+	@NoSideEffects
 	fun singleItem(): Pair<ItemId, Double> {
 		return withStackSize(1)
 	}
 
+	@NoSideEffects
 	fun withStackSize(size: Number): Pair<ItemId, Double> {
 		return Pair(this, size.toDouble())
 	}
@@ -15,6 +19,7 @@ data class ItemId(
 	companion object {
 
 		@JvmStatic
+		@NoSideEffects
 		fun forName(string: String) = ItemId(string)
 		fun skill(skill: String) = ItemId("SKYBLOCK_SKILL_$skill")
 
