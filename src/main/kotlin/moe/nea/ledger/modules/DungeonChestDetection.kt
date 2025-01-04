@@ -2,7 +2,6 @@ package moe.nea.ledger.modules
 
 import moe.nea.ledger.ExpiringValue
 import moe.nea.ledger.ItemChange
-import moe.nea.ledger.ItemId
 import moe.nea.ledger.LedgerEntry
 import moe.nea.ledger.LedgerLogger
 import moe.nea.ledger.TransactionType
@@ -16,6 +15,7 @@ import moe.nea.ledger.useMatcher
 import moe.nea.ledger.utils.di.Inject
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.time.Instant
+import java.util.concurrent.locks.ReentrantLock
 import kotlin.time.Duration.Companion.seconds
 
 class DungeonChestDetection @Inject constructor(val logger: LedgerLogger) : ChestDetection() {
@@ -43,8 +43,8 @@ class DungeonChestDetection @Inject constructor(val logger: LedgerLogger) : Ches
 
 	@SubscribeEvent
 	fun supplyExtraIds(event: ExtraSupplyIdEvent) {
-		event.store("Dungeon Chest Key", ItemId("DUNGEON_CHEST_KEY"))
-		event.store("Kismet Feather", ItemId("KISMET_FEATHER"))
+		event.store("Dungeon Chest Key", ItemIds.DUNGEON_CHEST_KEY)
+		event.store("Kismet Feather", ItemIds.KISMET_FEATHER)
 	}
 
 	@SubscribeEvent
@@ -52,7 +52,31 @@ class DungeonChestDetection @Inject constructor(val logger: LedgerLogger) : Ches
 		lastOpenedChest = ExpiringValue(scrapeChestReward(event.slotIn ?: return) ?: return)
 	}
 
-	val rewardMessage = " .* CHEST REWARDS".toPattern()
+	class Mutex<T>(defaultValue: T) {
+		private var value: T = defaultValue
+		val lock = ReentrantLock()
+
+		fun getUnsafeLockedValue(): T {
+			if (!lock.isHeldByCurrentThread)
+				error("Accessed unsafe locked value, without holding the lock.")
+			return value
+		}
+
+		fun <R> withLock(func: (T) -> R): R {
+			lock.lockInterruptibly()
+			try {
+				val ret = func(value)
+				if (ret === value) {
+					error("Please don't smuggle out the locked value. If this is unintentional, please append a `Unit` instruction to the end of your `withLock` call: `.withLock { /* your existing code */; Unit }`.")
+				}
+				return ret
+			} finally {
+				lock.unlock()
+			}
+		}
+	}
+
+	val rewardMessage = " (WOOD|GOLD|DIAMOND|EMERALD|OBSIDIAN|BEDROCK) CHEST REWARDS".toPattern()
 
 	@SubscribeEvent
 	fun onChatMessage(event: ChatReceived) {
