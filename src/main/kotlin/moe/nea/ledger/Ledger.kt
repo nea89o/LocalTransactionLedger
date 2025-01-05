@@ -11,6 +11,7 @@ import moe.nea.ledger.events.LateWorldLoadEvent
 import moe.nea.ledger.events.RegistrationFinishedEvent
 import moe.nea.ledger.events.WorldSwitchEvent
 import moe.nea.ledger.gen.BuildConfig
+import moe.nea.ledger.modules.AccessorySwapperDetection
 import moe.nea.ledger.modules.AuctionHouseDetection
 import moe.nea.ledger.modules.BankDetection
 import moe.nea.ledger.modules.BazaarDetection
@@ -116,6 +117,7 @@ class Ledger {
 		di.registerSingleton(gson)
 		di.register(LedgerConfig::class.java, DIProvider { managedConfig.instance })
 		di.registerInjectableClasses(
+			AccessorySwapperDetection::class.java,
 			AuctionHouseDetection::class.java,
 			BankDetection::class.java,
 			BazaarDetection::class.java,
