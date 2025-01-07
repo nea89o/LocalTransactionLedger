@@ -1,12 +1,8 @@
 import com.github.gmazzo.buildconfig.BuildConfigExtension
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import com.google.gson.Gson
-import com.google.gson.JsonObject
 import org.apache.commons.lang3.SystemUtils
 import proguard.gradle.ProGuardTask
 import java.io.ByteArrayOutputStream
-import java.net.URI
-import java.util.zip.ZipInputStream
 
 buildscript {
 	repositories {
@@ -25,6 +21,8 @@ plugins {
 	id("com.github.johnrengelman.shadow") version "8.1.1"
 	id("com.github.gmazzo.buildconfig") version "5.5.0"
 	kotlin("jvm") version "2.0.20"
+	id("ledger-marker")
+	id("ledger-repo")
 }
 
 fun cmd(vararg args: String): String {
@@ -41,9 +39,11 @@ val baseGroup: String by project
 val mcVersion: String by project
 val gitVersion = cmd("git", "rev-parse", "--short", "HEAD")
 val fullVersion = project.property("mod_version").toString()
-val version: String = "$fullVersion-$gitVersion"
+val versionName: String = "$fullVersion-$gitVersion"
 val mixinGroup = "$baseGroup.mixin"
-project.version = version
+allprojects {
+	version = versionName
+}
 val modid: String by project
 
 // Toolchains:
@@ -89,13 +89,20 @@ sourceSets.main {
 	kotlin.destinationDirectory.set(java.destinationDirectory)
 }
 
-repositories {
-	mavenCentral()
-	maven("https://repo.nea.moe/releases/")
-	maven("https://repo.spongepowered.org/maven/")
-	maven("https://maven.notenoughupdates.org/releases")
-	maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
+allprojects {
+	repositories {
+		mavenCentral()
+		maven("https://repo.nea.moe/releases/")
+		maven("https://repo.spongepowered.org/maven/")
+		maven("https://maven.notenoughupdates.org/releases")
+		maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
+	}
 }
+
+// TODO: Add an extra shadow configuration for optimizable jars
+//val optShadowImpl: Configuration by configurations.creating {
+//
+//}
 
 val shadowImpl: Configuration by configurations.creating {
 	configurations.implementation.get().extendsFrom(this)
@@ -117,6 +124,7 @@ dependencies {
 	shadowImpl("org.xerial:sqlite-jdbc:3.45.3.0")
 	shadowImpl("org.notenoughupdates.moulconfig:legacy:3.0.0-beta.9")
 	shadowImpl("io.azam.ulidj:ulidj:1.0.4")
+	shadowImpl(project(":dependency-injection"))
 	shadowImpl("moe.nea:libautoupdate:1.3.1")
 	runtimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.1.2")
 	testImplementation("org.junit.jupiter:junit-jupiter:5.9.2")
@@ -129,114 +137,25 @@ tasks.shadowJar {
 	doFirst { error("Incorrect shadow JAR built!") }
 }
 
-tasks.test {
-	useJUnitPlatform()
-}
+allprojects {
+	tasks.withType<Test> {
+		useJUnitPlatform()
+	}
 
-tasks.withType(JavaCompile::class) {
-	options.encoding = "UTF-8"
-}
-
-abstract class GenerateItemIds : DefaultTask() {
-	@get: OutputDirectory
-	abstract val outputDirectory: DirectoryProperty
-
-	@get: InputDirectory
-	abstract val repoFiles: DirectoryProperty
-
-	@get: Input
-	abstract val repoHash: Property<String>
-
-	@get: Input
-	abstract val packageName: Property<String>
-
-	@get:Internal
-	val outputFile get() = outputDirectory.asFile.get().resolve(packageName.get().replace(".", "/") + "/ItemIds.java")
-
-	@TaskAction
-	fun generateItemIds() {
-		val nonIdName = "[^A-Z0-9_]".toRegex()
-
-		data class Item(val id: String, val file: File) {
-			val javaName get() = id.replace(nonIdName, { "__" + it.value.single().code })
-		}
-
-		val items = mutableListOf<Item>()
-		for (listFile in repoFiles.asFile.get().resolve("items").listFiles() ?: emptyArray()) {
-			listFile ?: continue
-			if (listFile.extension != "json") {
-				error("Unknown file $listFile")
-			}
-			items.add(Item(listFile.nameWithoutExtension, listFile))
-		}
-		items.sortedBy { it.id }
-		outputFile.parentFile.mkdirs()
-		val writer = outputFile.writer().buffered()
-		writer.appendLine("// @generated from " + repoHash.get())
-		writer.appendLine("package " + packageName.get() + ";")
-		writer.appendLine()
-		writer.appendLine("import moe.nea.ledger.ItemId;")
-		writer.appendLine()
-		writer.appendLine("/**")
-		writer.appendLine(" * Automatically generated {@link ItemId} list.")
-		writer.appendLine(" */")
-		writer.appendLine("@org.jspecify.annotations.NullMarked")
-		writer.appendLine("public interface ItemIds {")
-		val gson = Gson()
-		for (item in items) {
-			writer.appendLine("\t/**")
-			writer.appendLine("\t * @see <a href=${gson.toJson("https://github.com/NotEnoughUpdates/NotEnoughUpdates-REPO/blob/${repoHash.get()}/items/${item.id}.json")}>JSON definition</a>")
-			writer.appendLine("\t */")
-			writer.appendLine("\tItemId ${item.javaName} =" +
-					                  " ItemId.forName(${gson.toJson(item.id)});")
-		}
-		writer.appendLine("}")
-		writer.close()
+	tasks.withType(JavaCompile::class) {
+		options.encoding = "UTF-8"
 	}
 }
 
-abstract class RepoDownload : DefaultTask() {
-	@get:Input
-	abstract val hash: Property<String>
-
-	@get:OutputDirectory
-	abstract val outputDirectory: DirectoryProperty
-
-	init {
-		outputDirectory.convention(project.layout.buildDirectory.dir("extracted-test-repo"))
-	}
-
-	@TaskAction
-	fun performDownload() {
-		val outputDir = outputDirectory.asFile.get().absoluteFile
-		outputDir.mkdirs()
-		URI("https://github.com/notEnoughUpdates/notEnoughUpdates-rEPO/archive/${hash.get()}.zip").toURL().openStream()
-			.let(::ZipInputStream)
-			.use { zipInput ->
-				while (true) {
-					val entry = zipInput.nextEntry ?: break
-					val destination = outputDir.resolve(
-						entry.name.substringAfter('/')).absoluteFile
-					require(outputDir in generateSequence(destination) { it.parentFile })
-					if (entry.isDirectory) continue
-					destination.parentFile.mkdirs()
-					destination.outputStream().use { output ->
-						zipInput.copyTo(output)
-					}
-				}
-			}
-	}
-}
-
-val downloadRepo by tasks.register("downloadRepo", RepoDownload::class) {
+tasks.downloadRepo {
 	hash.set("dcf1dbc")
 }
 
 val generateItemIds by tasks.register("generateItemIds", GenerateItemIds::class) {
-	repoHash.set(downloadRepo.hash)
+	repoHash.set(tasks.downloadRepo.get().hash)
 	packageName.set("moe.nea.ledger.gen")
 	outputDirectory.set(layout.buildDirectory.dir("generated/sources/itemIds"))
-	repoFiles.set(downloadRepo.outputDirectory)
+	repoFiles.set(tasks.downloadRepo.get().outputDirectory)
 }
 sourceSets.main {
 	java.srcDir(generateItemIds)
@@ -278,7 +197,6 @@ val proguard = tasks.register("proguard", ProGuardTask::class) {
 	val libJava = javaToolchains.launcherFor(java.toolchain)
 		.get()
 		.metadata.installationPath.file("jre/lib/rt.jar")
-	println(libJava)
 	libraryjars(libJava)
 	libraryjars(configurations.compileClasspath)
 }
@@ -313,10 +231,18 @@ tasks.jar {
 
 tasks.assemble.get().dependsOn(tasks.remapJar)
 
-configure<BuildConfigExtension> {
-	packageName("moe.nea.ledger.gen")
-	buildConfigField<String>("VERSION", version)
-	buildConfigField<String>("FULL_VERSION", fullVersion)
-	buildConfigField<String>("GIT_COMMIT", gitVersion)
+inline fun <reified T : Any> ExtensionAware.configureIf(crossinline block: T.() -> Unit) {
+	if (extensions.findByType<T>() != null) {
+		extensions.configure<T> { block() }
+	}
+}
+
+allprojects {
+	configureIf<BuildConfigExtension> {
+		packageName("moe.nea.ledger.gen")
+		buildConfigField<String>("VERSION", versionName)
+		buildConfigField<String>("FULL_VERSION", fullVersion)
+		buildConfigField<String>("GIT_COMMIT", gitVersion)
+	}
 }
 

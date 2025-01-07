@@ -47,6 +47,11 @@ class DI {
 		providers[type] = provider
 	}
 
+	fun <I : Any, T : I> registerInjectableInterface(parent: Class<I>, type: Class<T>) {
+		internalRegisterInjectableClass(type)
+		register(parent, DIProvider.fromInheritance(type))
+	}
+
 	fun registerInjectableClasses(vararg type: Class<*>) {
 		type.forEach { internalRegisterInjectableClass(it) }
 	}

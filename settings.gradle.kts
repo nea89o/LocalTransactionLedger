@@ -24,3 +24,5 @@ plugins {
 
 
 rootProject.name = "ledger"
+include("dependency-injection")
+includeBuild("build-src")

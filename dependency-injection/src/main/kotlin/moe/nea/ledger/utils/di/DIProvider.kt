@@ -18,7 +18,7 @@ fun interface DIProvider<T : Any> : BaseDIProvider<T, Unit> {
 
 	companion object {
 
-		fun <T : Any> fromInjectableClass(clazz: Class<T>): DIProvider<T> {
+		fun <T : Any> fromInjectableClass(clazz: Class<out T>): DIProvider<T> {
 			@Suppress("UNCHECKED_CAST")
 			val cons = (clazz.constructors.find { it.getAnnotation(Inject::class.java) != null }
 				?: clazz.constructors.find { it.parameterCount == 0 }
@@ -40,6 +40,10 @@ fun interface DIProvider<T : Any> : BaseDIProvider<T, Unit> {
 
 		fun <T : Any> singeleton(value: T): DIProvider<T> {
 			return DIProvider { _ -> value }
+		}
+
+		fun <I : Any> fromInheritance(type: Class<out I>): DIProvider<I> {
+			return DIProvider { it.provide(type) }
 		}
 	}
 
