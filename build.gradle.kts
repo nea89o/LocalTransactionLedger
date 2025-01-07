@@ -126,7 +126,7 @@ dependencies {
 	shadowImpl("io.azam.ulidj:ulidj:1.0.4")
 	shadowImpl(project(":dependency-injection"))
 	shadowImpl("moe.nea:libautoupdate:1.3.1")
-	runtimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.1.2")
+	runtimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.2.1")
 	testImplementation("org.junit.jupiter:junit-jupiter:5.9.2")
 }
 
