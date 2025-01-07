@@ -181,19 +181,13 @@ abstract class GenerateItemIds : DefaultTask() {
 		writer.appendLine(" * Automatically generated {@link ItemId} list.")
 		writer.appendLine(" */")
 		writer.appendLine("@org.jspecify.annotations.NullMarked")
-		writer.appendLine("public class ItemIds {")
+		writer.appendLine("public interface ItemIds {")
 		val gson = Gson()
 		for (item in items) {
-			val itemJson = gson.fromJson(item.file.readText(), JsonObject::class.java)
 			writer.appendLine("\t/**")
-			writer.appendLine("\t * <table border=\"1\">")
-			writer.appendLine("\t * <tr><th>Display Name</th><td>{@code ${itemJson["displayname"].asString}}</td></tr>")
-			writer.appendLine("\t * <tr><th>Vanilla Item</th><td>{@code ${itemJson["itemid"].asString}}</td></tr>")
-			writer.appendLine("\t * <tr><th>Internal Name</th><td>{@code ${itemJson["internalname"].asString}}</td></tr>")
-			writer.appendLine("\t * </table>")
 			writer.appendLine("\t * @see <a href=${gson.toJson("https://github.com/NotEnoughUpdates/NotEnoughUpdates-REPO/blob/${repoHash.get()}/items/${item.id}.json")}>JSON definition</a>")
 			writer.appendLine("\t */")
-			writer.appendLine("\tpublic static final ItemId ${item.javaName} =" +
+			writer.appendLine("\tItemId ${item.javaName} =" +
 					                  " ItemId.forName(${gson.toJson(item.id)});")
 		}
 		writer.appendLine("}")
@@ -235,7 +229,7 @@ abstract class RepoDownload : DefaultTask() {
 }
 
 val downloadRepo by tasks.register("downloadRepo", RepoDownload::class) {
-	hash.set("725ddb8")
+	hash.set("dcf1dbc")
 }
 
 val generateItemIds by tasks.register("generateItemIds", GenerateItemIds::class) {
