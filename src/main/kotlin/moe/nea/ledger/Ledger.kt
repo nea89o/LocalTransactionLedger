@@ -1,6 +1,7 @@
 package moe.nea.ledger
 
 import com.google.gson.Gson
+import io.github.notenoughupdates.moulconfig.Config
 import io.github.notenoughupdates.moulconfig.managed.ManagedConfig
 import moe.nea.ledger.config.LedgerConfig
 import moe.nea.ledger.config.UpdateUi
@@ -116,6 +117,7 @@ class Ledger {
 		di.registerSingleton(Minecraft.getMinecraft())
 		di.registerSingleton(gson)
 		di.register(LedgerConfig::class.java, DIProvider { managedConfig.instance })
+		di.register(Config::class.java, DIProvider.fromInheritance(LedgerConfig::class.java))
 		di.registerInjectableClasses(
 			AccessorySwapperDetection::class.java,
 			AuctionHouseDetection::class.java,

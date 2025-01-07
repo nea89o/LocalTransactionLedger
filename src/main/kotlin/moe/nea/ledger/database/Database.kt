@@ -1,6 +1,7 @@
 package moe.nea.ledger.database
 
 import moe.nea.ledger.Ledger
+import moe.nea.ledger.database.columns.DBString
 import java.sql.Connection
 import java.sql.DriverManager
 
@@ -42,6 +43,8 @@ class Database {
 
 		val oldVersion = meta[MetaKey.DATABASE_VERSION]?.toLong() ?: -1
 		println("Old Database Version: $oldVersion; Current version: $databaseVersion")
+		if (oldVersion > databaseVersion)
+			error("Outdated software. Database is newer than me!")
 		// TODO: create a backup if there is a db version upgrade happening
 		DBUpgrade.performUpgradeChain(
 			connection, oldVersion, databaseVersion,

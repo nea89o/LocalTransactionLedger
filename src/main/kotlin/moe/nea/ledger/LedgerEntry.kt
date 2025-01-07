@@ -22,7 +22,7 @@ data class LedgerEntry(
 			addProperty("profileId", profileId.toString())
 			addProperty(
 				"playerId",
-				UUIDUtil.getPlayerUUID().toString()
+				MCUUIDUtil.getPlayerUUID().toString()
 			)
 		}
 	}

@@ -6,6 +6,7 @@ import moe.nea.ledger.database.DBItemEntry
 import moe.nea.ledger.database.DBLogEntry
 import moe.nea.ledger.database.Database
 import moe.nea.ledger.events.ChatReceived
+import moe.nea.ledger.utils.ULIDWrapper
 import moe.nea.ledger.utils.di.Inject
 import net.minecraft.client.Minecraft
 import net.minecraft.util.ChatComponentText
@@ -86,10 +87,10 @@ class LedgerLogger {
 		if (shouldLog)
 			printToChat(entry)
 		Ledger.logger.info("Logging entry of type ${entry.transactionType}")
-		val transactionId = UUIDUtil.createULIDAt(entry.timestamp)
+		val transactionId = ULIDWrapper.createULIDAt(entry.timestamp)
 		DBLogEntry.insert(database.connection) {
-			it[DBLogEntry.profileId] = currentProfile ?: UUIDUtil.NIL_UUID
-			it[DBLogEntry.playerId] = UUIDUtil.getPlayerUUID()
+			it[DBLogEntry.profileId] = currentProfile ?: MCUUIDUtil.NIL_UUID
+			it[DBLogEntry.playerId] = MCUUIDUtil.getPlayerUUID()
 			it[DBLogEntry.type] = entry.transactionType
 			it[DBLogEntry.transactionId] = transactionId
 		}

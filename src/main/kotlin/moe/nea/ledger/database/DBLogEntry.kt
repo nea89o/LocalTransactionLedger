@@ -3,6 +3,11 @@ package moe.nea.ledger.database
 import moe.nea.ledger.ItemChange
 import moe.nea.ledger.ItemId
 import moe.nea.ledger.TransactionType
+import moe.nea.ledger.database.columns.DBDouble
+import moe.nea.ledger.database.columns.DBEnum
+import moe.nea.ledger.database.columns.DBString
+import moe.nea.ledger.database.columns.DBUlid
+import moe.nea.ledger.database.columns.DBUuid
 
 object DBLogEntry : Table("LogEntry") {
 	val transactionId = column("transactionId", DBUlid)

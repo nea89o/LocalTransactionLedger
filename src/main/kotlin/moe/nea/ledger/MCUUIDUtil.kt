@@ -1,25 +1,10 @@
 package moe.nea.ledger
 
 import com.mojang.util.UUIDTypeAdapter
-import io.azam.ulidj.ULID
 import net.minecraft.client.Minecraft
-import java.time.Instant
 import java.util.UUID
-import kotlin.random.Random
 
-object UUIDUtil {
-	@JvmInline
-	value class ULIDWrapper(
-		val wrapped: String
-	) {
-		fun getTimestamp(): Instant {
-			return Instant.ofEpochMilli(ULID.getTimestamp(wrapped))
-		}
-
-		init {
-			require(ULID.isValid(wrapped))
-		}
-	}
+object MCUUIDUtil {
 
 	fun parseDashlessUuid(string: String) = UUIDTypeAdapter.fromString(string)
 	val NIL_UUID = UUID(0L, 0L)
@@ -31,12 +16,6 @@ object UUIDUtil {
 		return currentUUID
 	}
 
-	fun createULIDAt(timestamp: Instant): ULIDWrapper {
-		return ULIDWrapper(ULID.generate(
-			timestamp.toEpochMilli(),
-			Random.nextBytes(10)
-		))
-	}
 
 	private var lastKnownUUID: UUID = NIL_UUID
 

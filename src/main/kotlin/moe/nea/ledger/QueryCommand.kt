@@ -1,11 +1,12 @@
 package moe.nea.ledger
 
-import moe.nea.ledger.database.ANDExpression
-import moe.nea.ledger.database.BooleanExpression
-import moe.nea.ledger.database.Clause
+import moe.nea.ledger.database.sql.ANDExpression
+import moe.nea.ledger.database.sql.BooleanExpression
+import moe.nea.ledger.database.sql.Clause
 import moe.nea.ledger.database.DBItemEntry
 import moe.nea.ledger.database.DBLogEntry
 import moe.nea.ledger.database.Database
+import moe.nea.ledger.utils.ULIDWrapper
 import moe.nea.ledger.utils.di.Inject
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
@@ -92,7 +93,7 @@ class QueryCommand : CommandBase() {
 			query.where(ANDExpression(value))
 		}
 		query.limit(80u)
-		val dedup = mutableSetOf<UUIDUtil.ULIDWrapper>()
+		val dedup = mutableSetOf<ULIDWrapper>()
 		query.forEach {
 			val type = it[DBLogEntry.type]
 			val transactionId = it[DBLogEntry.transactionId]

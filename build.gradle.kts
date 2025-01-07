@@ -125,6 +125,7 @@ dependencies {
 	shadowImpl("org.notenoughupdates.moulconfig:legacy:3.0.0-beta.9")
 	shadowImpl("io.azam.ulidj:ulidj:1.0.4")
 	shadowImpl(project(":dependency-injection"))
+	shadowImpl(project(":database:core"))
 	shadowImpl("moe.nea:libautoupdate:1.3.1")
 	runtimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.2.1")
 	testImplementation("org.junit.jupiter:junit-jupiter:5.9.2")
