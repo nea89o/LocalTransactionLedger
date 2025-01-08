@@ -30,6 +30,7 @@ loom {
 	log4jConfigs.from(file("log4j2.xml"))
 	runConfigs {
 		"client" {
+			isIdeConfigGenerated = true
 			property("ledger.bonusresourcemod", sourceSets.main.get().output.resourcesDir!!.absolutePath)
 			property("mixin.debug", "true")
 			programArgs("--tweakClass", "org.spongepowered.asm.launch.MixinTweaker")
@@ -160,6 +161,10 @@ tasks.remapJar {
 tasks.jar {
 	archiveClassifier.set("without-deps")
 	destinationDirectory.set(layout.buildDirectory.dir("badjars"))
+}
+
+tasks.runClient {
+	javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
 }
 
 tasks.assemble.get().dependsOn(tasks.remapJar)
