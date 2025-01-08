@@ -29,4 +29,5 @@ rootProject.name = "ledger"
 include("dependency-injection")
 include("database:core")
 include("basetypes")
+include("mod")
 includeBuild("build-src")

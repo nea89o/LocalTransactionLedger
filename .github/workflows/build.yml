@@ -24,18 +24,18 @@ jobs:
             -   name: Show build directory
                 if: runner.debug == '1'
                 run: |
-                    ls -lahR build
+                    ls -lahR mod/build
             -   name: Upload built mod JAR
                 uses: actions/upload-artifact@v4.3.0
                 with:
                     name: mod-jar
-                    path: build/libs/*.jar
+                    path: mod/build/libs/*.jar
             -   name: Upload partial JARs
                 if: runner.debug == '1'
                 uses: actions/upload-artifact@v4.3.0
                 with:
                     name: extras
-                    path: build/badjars/*.jar
+                    path: mod/build/badjars/*.jar
     release:
         runs-on: ubuntu-latest
         needs: gradle
