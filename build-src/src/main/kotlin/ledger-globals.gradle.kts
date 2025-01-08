@@ -13,3 +13,12 @@ tasks.withType<AbstractArchiveTask> {
 	this.isReproducibleFileOrder = true
 }
 
+tasks.withType<Test> {
+	useJUnitPlatform()
+}
+
+tasks.withType<JavaCompile> {
+	options.encoding = "UTF-8"
+}
+
+

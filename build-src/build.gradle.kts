@@ -1,11 +1,11 @@
 plugins {
-	kotlin("jvm") version "2.0.20"
+	`embedded-kotlin`
 	`kotlin-dsl`
 }
 repositories {
 	mavenCentral()
 }
 dependencies {
-	implementation("com.google.code.gson:gson:2.11.0")
+	implementation("com.google.code.gson:gson:2.9.1") // Match loom :)
 	implementation(gradleApi())
 }

@@ -1,6 +1,5 @@
 import com.github.gmazzo.buildconfig.BuildConfigExtension
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import org.apache.commons.lang3.SystemUtils
 import proguard.gradle.ProGuardTask
 import java.io.ByteArrayOutputStream
 
@@ -16,7 +15,7 @@ buildscript {
 plugins {
 	idea
 	java
-	id("gg.essential.loom") version "0.10.0.+"
+	id("gg.essential.loom") version "1.6.+"
 	id("dev.architectury.architectury-pack200") version "0.1.3"
 	id("com.github.johnrengelman.shadow") version "8.1.1"
 	id("com.github.gmazzo.buildconfig") version "5.5.0"
@@ -56,31 +55,21 @@ java {
 
 // Minecraft configuration:
 loom {
-	log4jConfigs.from(file("log4j2.xml"))
-	launchConfigs {
-		"client" {
-			property("ledger.bonusresourcemod", sourceSets.main.get().output.resourcesDir!!.absolutePath)
-			property("mixin.debug", "true")
-			arg("--tweakClass", "org.spongepowered.asm.launch.MixinTweaker")
-			arg("--tweakClass", "io.github.notenoughupdates.moulconfig.tweaker.DevelopmentResourceTweaker")
-		}
-	}
-	runConfigs {
-		"client" {
-			if (SystemUtils.IS_OS_MAC_OSX) {
-				// This argument causes a crash on macOS
-				vmArgs.remove("-XstartOnFirstThread")
-			}
-		}
-		remove(getByName("server"))
-	}
 	forge {
 		pack200Provider.set(dev.architectury.pack200.java.Pack200Adapter())
 		mixinConfig("mixins.$modid.json")
 	}
-	mixin {
-		defaultRefmapName.set("mixins.$modid.refmap.json")
+	log4jConfigs.from(file("log4j2.xml"))
+	runConfigs {
+		"client" {
+			property("ledger.bonusresourcemod", sourceSets.main.get().output.resourcesDir!!.absolutePath)
+			property("mixin.debug", "true")
+			programArgs("--tweakClass", "org.spongepowered.asm.launch.MixinTweaker")
+			programArgs("--tweakClass", "io.github.notenoughupdates.moulconfig.tweaker.DevelopmentResourceTweaker")
+		}
+		remove(getByName("server"))
 	}
+	mixin.useLegacyMixinAp.set(false)
 }
 
 // TODO: Add an extra shadow configuration for optimizable jars
@@ -103,7 +92,6 @@ dependencies {
 	shadowImpl("org.spongepowered:mixin:0.7.11-SNAPSHOT") {
 		isTransitive = false
 	}
-	annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT")
 
 	shadowImpl("org.xerial:sqlite-jdbc:3.45.3.0")
 	shadowImpl("org.notenoughupdates.moulconfig:legacy:3.0.0-beta.9")
@@ -124,16 +112,6 @@ tasks.shadowJar {
 	doFirst { error("Incorrect shadow JAR built!") }
 }
 
-allprojects {
-	tasks.withType<Test> {
-		useJUnitPlatform()
-	}
-
-	tasks.withType(JavaCompile::class) {
-		options.encoding = "UTF-8"
-	}
-}
-
 tasks.downloadRepo {
 	hash.set("dcf1dbc")
 }
@@ -148,7 +126,7 @@ sourceSets.main {
 	java.srcDir(generateItemIds)
 }
 
-tasks.withType(Jar::class) {
+tasks.withType<Jar> {
 	archiveBaseName.set(modid)
 	manifest.attributes.run {
 		this["FMLCorePluginContainsFMLMod"] = "true"
@@ -169,8 +147,6 @@ tasks.processResources {
 	filesMatching(listOf("mcmod.info", "mixins.$modid.json")) {
 		expand(inputs.properties)
 	}
-
-	rename("(.+_at.cfg)", "META-INF/$1")
 }
 
 
@@ -180,7 +156,6 @@ val proguard = tasks.register("proguard", ProGuardTask::class) {
 	injars(tasks.jar.map { it.archiveFile })
 	outjars(proguardOutJar)
 	configuration(file("ledger-rules.pro"))
-	verbose()
 	val libJava = javaToolchains.launcherFor(java.toolchain)
 		.get()
 		.metadata.installationPath.file("jre/lib/rt.jar")
@@ -210,17 +185,15 @@ val shadowJar2 = tasks.register("shadowJar2", ShadowJar::class) {
 		"META-INF/versions/**"
 	)
 }
-val remapJar by tasks.named<net.fabricmc.loom.task.RemapJarTask>("remapJar") {
+tasks.remapJar {
 	archiveClassifier.set("")
-	from(shadowJar2)
-	input.set(shadowJar2.get().archiveFile)
+	inputFile.set(shadowJar2.flatMap { it.archiveFile })
 }
 
 tasks.jar {
 	archiveClassifier.set("without-deps")
 	destinationDirectory.set(layout.buildDirectory.dir("badjars"))
 }
-
 
 tasks.assemble.get().dependsOn(tasks.remapJar)
 
