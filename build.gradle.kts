@@ -83,16 +83,6 @@ loom {
 	}
 }
 
-allprojects {
-	repositories {
-		mavenCentral()
-		maven("https://repo.nea.moe/releases/")
-		maven("https://repo.spongepowered.org/maven/")
-		maven("https://maven.notenoughupdates.org/releases")
-		maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
-	}
-}
-
 // TODO: Add an extra shadow configuration for optimizable jars
 //val optShadowImpl: Configuration by configurations.creating {
 //
@@ -120,7 +110,9 @@ dependencies {
 	shadowImpl("io.azam.ulidj:ulidj:1.0.4")
 	shadowImpl(project(":dependency-injection"))
 	shadowImpl(project(":database:core"))
-	shadowImpl("moe.nea:libautoupdate:1.3.1")
+	shadowImpl("moe.nea:libautoupdate:1.3.1") {
+		exclude(module = "gson")
+	}
 	runtimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.2.1")
 	testImplementation("org.junit.jupiter:junit-jupiter:5.9.2")
 }
@@ -203,13 +195,19 @@ val shadowJar2 = tasks.register("shadowJar2", ShadowJar::class) {
 	dependsOn(proguard)
 	configurations = listOf(shadowImpl)
 	relocate("moe.nea.libautoupdate", "moe.nea.ledger.deps.libautoupdate")
+	relocate("io.github.notenoughupdates.moulconfig", "moe.nea.ledger.deps.moulconfig")
+	relocate("io.azam.ulidj", "moe.nea.ledger.deps.ulid")
 	mergeServiceFiles()
 	exclude(
+		// Signatures
 		"META-INF/INDEX.LIST",
 		"META-INF/*.SF",
 		"META-INF/*.DSA",
 		"META-INF/*.RSA",
 		"module-info.class",
+
+		"META-INF/*.kotlin_module",
+		"META-INF/versions/**"
 	)
 }
 val remapJar by tasks.named<net.fabricmc.loom.task.RemapJarTask>("remapJar") {
