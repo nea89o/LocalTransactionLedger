@@ -21,8 +21,11 @@ plugins {
 	id("com.github.johnrengelman.shadow") version "8.1.1"
 	id("com.github.gmazzo.buildconfig") version "5.5.0"
 	kotlin("jvm") version "2.0.20"
-	id("ledger-marker")
+	id("ledger-globals")
 	id("ledger-repo")
+}
+allprojects {
+	apply(plugin = "ledger-globals")
 }
 
 fun cmd(vararg args: String): String {
@@ -226,6 +229,7 @@ val remapJar by tasks.named<net.fabricmc.loom.task.RemapJarTask>("remapJar") {
 
 tasks.jar {
 	archiveClassifier.set("without-deps")
+	dependsOn(tasks.processResources) // Why is this needed?
 	destinationDirectory.set(layout.buildDirectory.dir("badjars"))
 }
 
