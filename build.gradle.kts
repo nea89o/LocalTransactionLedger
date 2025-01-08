@@ -59,6 +59,7 @@ loom {
 	log4jConfigs.from(file("log4j2.xml"))
 	launchConfigs {
 		"client" {
+			property("ledger.bonusresourcemod", sourceSets.main.get().output.resourcesDir!!.absolutePath)
 			property("mixin.debug", "true")
 			arg("--tweakClass", "org.spongepowered.asm.launch.MixinTweaker")
 			arg("--tweakClass", "io.github.notenoughupdates.moulconfig.tweaker.DevelopmentResourceTweaker")
@@ -80,16 +81,6 @@ loom {
 	mixin {
 		defaultRefmapName.set("mixins.$modid.refmap.json")
 	}
-}
-
-tasks.compileJava {
-	dependsOn(tasks.processResources)
-}
-
-sourceSets.main {
-	output.setResourcesDir(sourceSets.main.flatMap { it.java.classesDirectory })
-	java.srcDir(layout.projectDirectory.dir("src/main/kotlin"))
-	kotlin.destinationDirectory.set(java.destinationDirectory)
 }
 
 allprojects {
@@ -229,7 +220,6 @@ val remapJar by tasks.named<net.fabricmc.loom.task.RemapJarTask>("remapJar") {
 
 tasks.jar {
 	archiveClassifier.set("without-deps")
-	dependsOn(tasks.processResources) // Why is this needed?
 	destinationDirectory.set(layout.buildDirectory.dir("badjars"))
 }
 
