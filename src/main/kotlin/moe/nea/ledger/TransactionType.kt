@@ -2,6 +2,7 @@ package moe.nea.ledger
 
 enum class TransactionType {
 	ACCESSORIES_SWAPPING,
+	ALLOWANCE_GAIN,
 	AUCTION_BOUGHT,
 	AUCTION_LISTING_CHARGE,
 	AUCTION_SOLD,
