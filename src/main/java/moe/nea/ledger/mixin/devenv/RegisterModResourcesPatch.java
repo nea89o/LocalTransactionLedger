@@ -1,4 +1,4 @@
-package moe.nea.ledger.mixin;
+package moe.nea.ledger.mixin.devenv;
 
 import com.google.common.eventbus.EventBus;
 import net.minecraftforge.fml.client.FMLFileResourcePack;
