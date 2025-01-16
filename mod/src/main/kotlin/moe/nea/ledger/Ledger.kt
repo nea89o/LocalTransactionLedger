@@ -35,6 +35,7 @@ import moe.nea.ledger.modules.KuudraChestDetection
 import moe.nea.ledger.modules.MineshaftCorpseDetection
 import moe.nea.ledger.modules.MinionDetection
 import moe.nea.ledger.modules.NpcDetection
+import moe.nea.ledger.modules.PestRepellentDetection
 import moe.nea.ledger.modules.UpdateChecker
 import moe.nea.ledger.modules.VisitorDetection
 import moe.nea.ledger.utils.ErrorUtil
@@ -152,6 +153,7 @@ class Ledger {
 			MineshaftCorpseDetection::class.java,
 			MinionDetection::class.java,
 			NpcDetection::class.java,
+			PestRepellentDetection::class.java,
 			QueryCommand::class.java,
 			RequestUtil::class.java,
 			TriggerCommand::class.java,
