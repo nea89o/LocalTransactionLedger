@@ -76,7 +76,7 @@ class DungeonChestDetection @Inject constructor(val logger: LedgerLogger) : Ches
 		}
 	}
 
-	val rewardMessage = " (WOOD|GOLD|DIAMOND|EMERALD|OBSIDIAN|BEDROCK) CHEST REWARDS".toPattern()
+	val rewardMessage = " *(WOOD|GOLD|DIAMOND|EMERALD|OBSIDIAN|BEDROCK) CHEST REWARDS".toPattern()
 
 	@SubscribeEvent
 	fun onChatMessage(event: ChatReceived) {

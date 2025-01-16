@@ -36,6 +36,9 @@ class KuudraChestDetection : ChestDetection() {
 		if (requiredKey != null && !hasKey(requiredKey)) {
 			return
 		}
+		if (requiredKey == null && event.slotIn.inventory.name != "Free Chest") {
+			return
+		}
 		log.logEntry(LedgerEntry(
 			TransactionType.KUUDRA_CHEST_OPEN,
 			diffs.timestamp,

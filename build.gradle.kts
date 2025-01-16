@@ -1,19 +1,11 @@
 import com.github.gmazzo.buildconfig.BuildConfigExtension
 import java.io.ByteArrayOutputStream
 
-buildscript {
-	repositories {
-		mavenCentral()
-	}
-	dependencies {
-		classpath("com.guardsquare:proguard-gradle:7.6.1")
-	}
-}
-
 plugins {
 	kotlin("jvm") version "2.0.20" apply false
 	id("com.github.gmazzo.buildconfig") version "5.5.0" apply false
 	id("ledger-globals")
+	id("com.github.johnrengelman.shadow") version "8.1.1" apply false
 }
 
 allprojects {

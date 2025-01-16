@@ -22,10 +22,10 @@ class BitsShopDetection @Inject constructor(val ledger: LedgerLogger) {
 
 
     data class BitShopEntry(
-        val id: ItemId,
-        val stackSize: Int,
-        val bitPrice: Int,
-        val timestamp: Long = System.currentTimeMillis()
+	    val id: ItemId,
+	    val stackSize: Int,
+	    val bitPrice: Int,
+	    val timestamp: Long = System.currentTimeMillis()
     )
 
     var lastClickedBitShopItem: BitShopEntry? = null

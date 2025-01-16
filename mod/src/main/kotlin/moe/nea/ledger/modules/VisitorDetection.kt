@@ -5,15 +5,12 @@ import moe.nea.ledger.ItemId
 import moe.nea.ledger.ItemIdProvider
 import moe.nea.ledger.LedgerEntry
 import moe.nea.ledger.LedgerLogger
-import moe.nea.ledger.SHORT_NUMBER_PATTERN
 import moe.nea.ledger.TransactionType
 import moe.nea.ledger.events.ExtraSupplyIdEvent
 import moe.nea.ledger.events.GuiClickEvent
 import moe.nea.ledger.getDisplayNameU
 import moe.nea.ledger.getLore
-import moe.nea.ledger.parseShortNumber
 import moe.nea.ledger.unformattedString
-import moe.nea.ledger.useMatcher
 import moe.nea.ledger.utils.di.Inject
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.time.Instant

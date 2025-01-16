@@ -1,7 +1,6 @@
 package moe.nea.ledger.modules
 
 import moe.nea.ledger.ItemChange
-import moe.nea.ledger.ItemId
 import moe.nea.ledger.events.ChatReceived
 import moe.nea.ledger.events.LateWorldLoadEvent
 import moe.nea.ledger.LedgerEntry
