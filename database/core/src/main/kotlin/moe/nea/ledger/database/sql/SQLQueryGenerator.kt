@@ -6,14 +6,14 @@ import java.sql.PreparedStatement
 
 object SQLQueryGenerator {
 	fun List<SQLQueryComponent>.concatToFilledPreparedStatement(connection: Connection): PreparedStatement {
-		var query = ""
+		val query = StringBuilder()
 		for (element in this) {
 			if (query.isNotEmpty()) {
-				query += " "
+				query.append(" ")
 			}
-			query += element.asSql()
+			query.append(element.asSql())
 		}
-		val statement = connection.prepareAndLog(query)
+		val statement = connection.prepareAndLog(query.toString())
 		var index = 1
 		for (element in this) {
 			val nextIndex = element.appendToStatement(statement, index)

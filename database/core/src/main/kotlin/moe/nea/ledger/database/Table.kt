@@ -98,6 +98,6 @@ abstract class Table(val name: String) {
 	}
 
 	fun selectAll(connection: Connection): Query {
-		return Query(connection, columns.toMutableList(), this)
+		return Query(connection, columns.mapTo(mutableListOf()) { it.asSelectable() }, this)
 	}
 }
