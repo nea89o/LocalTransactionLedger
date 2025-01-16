@@ -28,6 +28,7 @@ plugins {
 rootProject.name = "ledger"
 include("dependency-injection")
 include("database:core")
+include("database:impl")
 include("basetypes")
 include("mod")
 includeBuild("build-src")

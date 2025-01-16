@@ -119,6 +119,7 @@ class Ledger {
 		di.registerSingleton(gson)
 		di.register(LedgerConfig::class.java, DIProvider { managedConfig.instance })
 		di.register(Config::class.java, DIProvider.fromInheritance(LedgerConfig::class.java))
+		di.register(Database::class.java, DIProvider { Database(dataFolder) })
 		di.registerInjectableClasses(
 			AccessorySwapperDetection::class.java,
 			AllowanceDetection::class.java,
@@ -129,7 +130,6 @@ class Ledger {
 			BitsDetection::class.java,
 			BitsShopDetection::class.java,
 			ConfigCommand::class.java,
-			Database::class.java,
 			DebugDataCommand::class.java,
 			DragonEyePlacementDetection::class.java,
 			DragonSacrificeDetection::class.java,

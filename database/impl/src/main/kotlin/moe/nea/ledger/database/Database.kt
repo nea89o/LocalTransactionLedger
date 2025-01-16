@@ -1,11 +1,11 @@
 package moe.nea.ledger.database
 
-import moe.nea.ledger.Ledger
 import moe.nea.ledger.database.columns.DBString
+import java.io.File
 import java.sql.Connection
 import java.sql.DriverManager
 
-class Database {
+class Database(val dataFolder: File) {
 	lateinit var connection: Connection
 
 	object MetaTable : Table("LedgerMeta") {
@@ -34,7 +34,7 @@ class Database {
 	val databaseVersion: Long = 1
 
 	fun loadAndUpgrade() {
-		connection = DriverManager.getConnection("jdbc:sqlite:${Ledger.dataFolder.resolve("database.db")}")
+		connection = DriverManager.getConnection("jdbc:sqlite:${dataFolder.resolve("database.db")}")
 		MetaTable.createIfNotExists(connection)
 		val meta = MetaTable.selectAll(connection).associate { MetaKey(it[MetaTable.key]) to it[MetaTable.value] }
 		val lastLaunch = meta[MetaKey.LAST_LAUNCH]?.toLong() ?: 0L

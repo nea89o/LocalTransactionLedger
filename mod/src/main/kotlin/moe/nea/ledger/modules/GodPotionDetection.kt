@@ -22,9 +22,9 @@ class GodPotionDetection {
         godPotionDrank.useMatcher(event.message) {
             logger.logEntry(
                 LedgerEntry(
-                    TransactionType.GOD_POTION_DRANK,
-                    event.timestamp,
-                    listOf(
+	                TransactionType.GOD_POTION_DRANK,
+	                event.timestamp,
+	                listOf(
                         ItemChange.lose(ItemIds.GOD_POTION_2, 1)
                     )
                 )

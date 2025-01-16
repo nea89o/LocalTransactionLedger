@@ -50,8 +50,8 @@ class BitsDetection @Inject constructor(val ledger: LedgerLogger) {
             ledger.logEntry(
                 LedgerEntry(
 	                TransactionType.BOOSTER_COOKIE_ATE,
-                    Instant.now(),
-					listOf(
+	                Instant.now(),
+	                listOf(
 						ItemChange.lose(ItemIds.BOOSTER_COOKIE, 1)
 					)
                 )

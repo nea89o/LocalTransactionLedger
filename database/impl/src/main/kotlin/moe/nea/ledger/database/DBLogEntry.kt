@@ -21,4 +21,12 @@ object DBItemEntry : Table("ItemEntry") {
 	val mode = column("mode", DBEnum<ItemChange.ChangeDirection>())
 	val itemId = column("item", DBString.mapped(ItemId::string, ::ItemId))
 	val size = column("size", DBDouble)
+
+	fun objMap(result: ResultRow): ItemChange {
+		return ItemChange(
+			result[itemId],
+			result[size],
+			result[mode],
+		)
+	}
 }

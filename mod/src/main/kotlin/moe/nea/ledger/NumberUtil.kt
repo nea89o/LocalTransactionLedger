@@ -115,3 +115,38 @@ fun Instant.formatChat(): IChatComponent {
 			.setColor(EnumChatFormatting.AQUA))
 	return text
 }
+
+private val formatChatDirection = run {
+	fun ItemChange.ChangeDirection.formatChat0(): IChatComponent {
+		val (text, color) = when (this) {
+			ItemChange.ChangeDirection.GAINED -> "+" to EnumChatFormatting.GREEN
+			ItemChange.ChangeDirection.TRANSFORM -> "~" to EnumChatFormatting.YELLOW
+			ItemChange.ChangeDirection.SYNC -> "=" to EnumChatFormatting.BLUE
+			ItemChange.ChangeDirection.CATALYST -> "*" to EnumChatFormatting.DARK_PURPLE
+			ItemChange.ChangeDirection.LOST -> "-" to EnumChatFormatting.RED
+		}
+		return ChatComponentText(text)
+			.setChatStyle(
+				ChatStyle()
+					.setColor(color)
+					.setChatHoverEvent(HoverEvent(HoverEvent.Action.SHOW_TEXT,
+					                              ChatComponentText(name).setChatStyle(ChatStyle().setColor(color)))))
+	}
+	ItemChange.ChangeDirection.entries.associateWith { it.formatChat0() }
+}
+
+fun ItemChange.ChangeDirection.formatChat(): IChatComponent {
+	return formatChatDirection[this]!!
+}
+
+fun ItemChange.formatChat(): IChatComponent {
+	return ChatComponentText(" ")
+		.appendSibling(direction.formatChat())
+		.appendText(" ")
+		.appendSibling(ChatComponentText("$count").setChatStyle(ChatStyle().setColor(EnumChatFormatting.WHITE)))
+		.appendSibling(ChatComponentText("x").setChatStyle(ChatStyle().setColor(EnumChatFormatting.DARK_GRAY)))
+		.appendText(" ")
+		.appendSibling(ChatComponentText(itemId.string).setChatStyle(ChatStyle().setParentStyle(ChatStyle().setColor(
+			EnumChatFormatting.WHITE))))
+}
+

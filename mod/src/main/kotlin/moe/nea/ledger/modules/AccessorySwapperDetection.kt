@@ -22,9 +22,9 @@ class AccessorySwapperDetection {
         swapperUsed.useMatcher(event.message) {
             logger.logEntry(
                 LedgerEntry(
-                    TransactionType.ACCESSORIES_SWAPPING,
-                    event.timestamp,
-                    listOf(
+	                TransactionType.ACCESSORIES_SWAPPING,
+	                event.timestamp,
+	                listOf(
                         ItemChange.lose(ItemIds.TALISMAN_ENRICHMENT_SWAPPER, 1)
                     )
                 )

@@ -22,9 +22,9 @@ class EyedropsDetection {
         capsaicinEyedropsUsed.useMatcher(event.message) {
             logger.logEntry(
                 LedgerEntry(
-                    TransactionType.CAPSAICIN_EYEDROPS_USED,
-                    event.timestamp,
-                    listOf(
+	                TransactionType.CAPSAICIN_EYEDROPS_USED,
+	                event.timestamp,
+	                listOf(
                         ItemChange.lose(ItemIds.CAPSAICIN_EYEDROPS_NO_CHARGES, 1)
                     )
                 )

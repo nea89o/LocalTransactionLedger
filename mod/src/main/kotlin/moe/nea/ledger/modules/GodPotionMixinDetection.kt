@@ -26,9 +26,9 @@ class GodPotionMixinDetection {
         godPotionMixinDrank.useMatcher(event.message) {
             logger.logEntry(
                 LedgerEntry(
-                    TransactionType.GOD_POTION_MIXIN_DRANK,
-                    event.timestamp,
-                    listOf(
+	                TransactionType.GOD_POTION_MIXIN_DRANK,
+	                event.timestamp,
+	                listOf(
                         ItemChange.lose(itemIdProvider.findForName(group("what")) ?: ItemId.NIL, 1)
                     )
                 )

@@ -103,7 +103,7 @@ class QueryCommand : CommandBase() {
 			val timestamp = transactionId.getTimestamp()
 			val items = DBItemEntry.selectAll(database.connection)
 				.where(Clause { column(DBItemEntry.transactionId) eq string(transactionId.wrapped) })
-				.map { ItemChange.from(it) }
+				.map { DBItemEntry.objMap(it) }
 			val text = ChatComponentText("")
 				.setChatStyle(ChatStyle().setColor(EnumChatFormatting.YELLOW))
 				.appendSibling(
