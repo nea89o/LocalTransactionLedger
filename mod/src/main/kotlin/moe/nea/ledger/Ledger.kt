@@ -129,7 +129,6 @@ class Ledger {
 			AllowanceDetection::class.java,
 			AuctionHouseDetection::class.java,
 			BankDetection::class.java,
-			BankInterestDetection::class.java,
 			BasicReforgeDetection::class.java,
 			BazaarDetection::class.java,
 			BazaarOrderDetection::class.java,
