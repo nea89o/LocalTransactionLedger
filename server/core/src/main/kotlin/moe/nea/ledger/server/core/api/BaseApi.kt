@@ -21,8 +21,21 @@ fun Route.apiRouting(database: Database) {
 			}
 		call.respond(profiles)
 	}.docs {
+		summary = "List all profiles and players known to ledger"
+		operationId = "listProfiles"
+		tag(Tags.PROFILE)
 		respondsOk {
 			schema<List<Profile>>()
 		}
+	}
+}
+
+enum class Tags : IntoTag {
+	PROFILE,
+	MANAGEMENT,
+	;
+
+	override fun intoTag(): String {
+		return name
 	}
 }

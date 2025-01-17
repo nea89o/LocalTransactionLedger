@@ -14,6 +14,7 @@ import moe.nea.ledger.server.core.api.Documentation
 import moe.nea.ledger.server.core.api.Info
 import moe.nea.ledger.server.core.api.apiRouting
 import moe.nea.ledger.server.core.api.openApiDocsJson
+import moe.nea.ledger.server.core.api.openApiUi
 import java.io.File
 
 fun main(args: Array<String>) {
@@ -45,6 +46,9 @@ fun Application.module() {
 		}
 		route("/api.json") {
 			openApiDocsJson()
+		}
+		route("/openapi") {
+			openApiUi("/api.json")
 		}
 	}
 }

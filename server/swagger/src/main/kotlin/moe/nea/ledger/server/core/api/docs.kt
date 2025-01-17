@@ -2,9 +2,12 @@ package moe.nea.ledger.server.core.api
 
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.content.OutgoingContent
+import io.ktor.http.defaultForFilePath
 import io.ktor.server.application.ApplicationCallPipeline
 import io.ktor.server.application.BaseApplicationPlugin
 import io.ktor.server.response.respond
+import io.ktor.server.response.respondText
 import io.ktor.server.routing.HttpMethodRouteSelector
 import io.ktor.server.routing.PathSegmentConstantRouteSelector
 import io.ktor.server.routing.RootRouteSelector
@@ -12,9 +15,16 @@ import io.ktor.server.routing.Route
 import io.ktor.server.routing.RoutingNode
 import io.ktor.server.routing.TrailingSlashRouteSelector
 import io.ktor.server.routing.get
+import io.ktor.server.routing.route
 import io.ktor.util.AttributeKey
+import io.ktor.util.cio.KtorDefaultPool
+import io.ktor.utils.io.ByteReadChannel
+import io.ktor.utils.io.jvm.javaio.toByteReadChannel
+import kotlinx.serialization.json.JsonPrimitive
 import sh.ondr.jsonschema.JsonSchema
 import sh.ondr.jsonschema.jsonSchema
+import java.io.File
+import java.io.InputStream
 
 
 fun Route.openApiDocsJson() {
@@ -23,6 +33,70 @@ fun Route.openApiDocsJson() {
 		val model = docs.finalizeJson()
 		call.respond(model)
 	}
+}
+
+fun Route.openApiUi(apiJsonUrl: String) {
+	get("swagger-initializer.js") {
+		call.respondText(
+			//language=JavaScript
+			"""
+			window.onload = function() {
+			  //<editor-fold desc="Changeable Configuration Block">
+
+			  // the following lines will be replaced by docker/configurator, when it runs in a docker-container
+			  window.ui = SwaggerUIBundle({
+			    url: ${JsonPrimitive(apiJsonUrl)},
+			    dom_id: '#swagger-ui',
+			    deepLinking: true,
+			    presets: [
+			      SwaggerUIBundle.presets.apis,
+			      SwaggerUIStandalonePreset
+			    ],
+			    plugins: [
+			      SwaggerUIBundle.plugins.DownloadUrl
+			    ],
+			    layout: "StandaloneLayout"
+			  });
+
+			  //</editor-fold>
+			};
+		""".trimIndent())
+	}
+//	val swaggerUiProperties =
+//		environment.classLoader.getResource("/META-INF/maven/org.webjars/swagger-ui/pom.properties")
+//			?: error("Could not find swagger webjar")
+//	val swaggerUiZip = swaggerUiProperties.toString().substringBefore("!")
+	val pathParameterName = "static-content-path-parameter"
+	route("{$pathParameterName...}") {
+		get {
+			var requestedPath = call.parameters.getAll(pathParameterName)?.joinToString(File.separator) ?: ""
+			requestedPath = requestedPath.replace("\\", "/")
+			if (requestedPath.isEmpty()) requestedPath = "index.html"
+			if (requestedPath.contains("..")) {
+				call.respondText("Forbidden", status = HttpStatusCode.Forbidden)
+				return@get
+			}
+			//TODO: I mean i should read out the version properties but idc
+			val version = "5.18.2"
+			val resource =
+				environment.classLoader.getResourceAsStream("META-INF/resources/webjars/swagger-ui/$version/$requestedPath")
+
+			if (resource == null) {
+				call.respondText("Not Found", status = HttpStatusCode.NotFound)
+				return@get
+			}
+
+			call.respond(InputStreamContent(resource, ContentType.defaultForFilePath(requestedPath)))
+		}
+	}
+}
+
+internal class InputStreamContent(
+	private val input: InputStream,
+	override val contentType: ContentType
+) : OutgoingContent.ReadChannelContent() {
+
+	override fun readFrom(): ByteReadChannel = input.toByteReadChannel(pool = KtorDefaultPool)
 }
 
 class DocumentationPath(val path: String) {
@@ -45,12 +119,13 @@ class DocumentationPath(val path: String) {
 				return "/"
 			}
 			var parentPath = createRoutePath(baseRoute, parent)
-			if (!parentPath.endsWith("/"))
-				parentPath += "/"
+			var parentPathAppendable = parentPath
+			if (!parentPathAppendable.endsWith("/"))
+				parentPathAppendable += "/"
 			return when (val selector = route.selector) {
-				is TrailingSlashRouteSelector -> parentPath
+				is TrailingSlashRouteSelector -> parentPathAppendable
 				is RootRouteSelector -> parentPath
-				is PathSegmentConstantRouteSelector -> parentPath + selector.value
+				is PathSegmentConstantRouteSelector -> parentPathAppendable + selector.value
 				is HttpMethodRouteSelector -> parentPath // TODO: generate a separate path here
 				else -> error("Could not comprehend $selector (${selector.javaClass})")
 			}
@@ -74,6 +149,10 @@ class Response {
 	}
 }
 
+interface IntoTag {
+	fun intoTag(): String
+}
+
 class DocumentationContext(val path: DocumentationPath) {
 	val responses = mutableMapOf<HttpStatusCode, Response>()
 	fun responds(statusCode: HttpStatusCode, block: Response.() -> Unit) {
@@ -86,16 +165,27 @@ class DocumentationContext(val path: DocumentationPath) {
 
 	var summary: String = ""
 	var description: String = ""
+	var deprecated: Boolean = false
+	var operationId: String = ""
+	val tags: MutableList<String> = mutableListOf()
+	fun tag(vararg tag: String) {
+		tags.addAll(tag)
+	}
+
+	fun tag(vararg tag: IntoTag) {
+		tag.mapTo(tags) { it.intoTag() }
+	}
+
 	fun intoJson(): OpenApiRoute {
 		return OpenApiRoute(
 			summary,
 			description,
 			get = OpenApiOperation(
-				tags = listOf(), // TODO: tags
-				summary = "",
-				description = "",
-				operationId = "",
-				deprecated = false,
+				tags = tags.map { Tag(it) },
+				summary = summary,
+				description = description,
+				operationId = operationId,
+				deprecated = deprecated,
 				responses = responses.mapValues {
 					it.value.intoJson()
 				}
