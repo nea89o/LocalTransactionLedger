@@ -6,6 +6,7 @@ plugins {
 }
 
 val webDist by tasks.register("webDist", PnpmTask::class) {
+	dependsOn(tasks.pnpmInstall)
 	args.addAll("build")
 	outputs.dir("dist")
 }
