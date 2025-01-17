@@ -6,6 +6,7 @@ import io.ktor.server.application.install
 import io.ktor.server.netty.EngineMain
 import io.ktor.server.plugins.compression.Compression
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.server.plugins.cors.routing.CORS
 import io.ktor.server.response.respondRedirect
 import io.ktor.server.routing.get
 import io.ktor.server.routing.route
@@ -45,6 +46,9 @@ fun Application.module() {
 			this.encodeDefaults = true
 		})
 //		cbor()
+	}
+	install(CORS) {
+		anyHost()
 	}
 	val database = Database(File(System.getProperty("ledger.databasefolder")))
 	database.loadAndUpgrade()

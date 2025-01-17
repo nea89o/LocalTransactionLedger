@@ -190,12 +190,27 @@ class DocumentationOperationContext(val route: DocumentationContext) {
 	var deprecated: Boolean = false
 	var operationId: String = ""
 	val tags: MutableList<String> = mutableListOf()
+	val parameters: MutableList<OpenApiParameter> = mutableListOf()
 	fun tag(vararg tag: String) {
 		tags.addAll(tag)
 	}
 
 	fun tag(vararg tag: IntoTag) {
 		tag.mapTo(tags) { it.intoTag() }
+	}
+
+	inline fun <reified T : Any> queryParameter(name: String, description: String = "") {
+		parameter(ParameterLocation.QUERY, name, description, jsonSchema<T>())
+	}
+
+	fun parameter(
+		location: ParameterLocation, name: String,
+		description: String = "", schema: JsonSchema? = null
+	) {
+		parameters.add(OpenApiParameter(
+			location, name, description,
+			schema
+		))
 	}
 
 	fun intoJson(): OpenApiOperation {
@@ -205,6 +220,7 @@ class DocumentationOperationContext(val route: DocumentationContext) {
 			description = description,
 			operationId = operationId,
 			deprecated = deprecated,
+			parameters = parameters,
 			responses = responses.mapValues {
 				it.value.intoJson()
 			}

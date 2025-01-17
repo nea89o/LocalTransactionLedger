@@ -3,6 +3,7 @@ package moe.nea.ledger.server.core.api
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
@@ -41,9 +42,25 @@ data class OpenApiOperation(
 	val description: String,
 	val operationId: String,
 	val deprecated: Boolean,
-//	val parameters: List<Parameter>,
+	val parameters: List<OpenApiParameter>,
 	val responses: Map<@Serializable(HttpStatusCodeIntAsString::class) HttpStatusCode, OpenApiResponse>
 )
+
+@Serializable
+data class OpenApiParameter(
+	@SerialName("in") val location: ParameterLocation,
+	val name: String,
+	val description: String,
+	val schema: JsonSchema?,
+)
+
+@Serializable
+enum class ParameterLocation {
+	@SerialName("query")
+	QUERY,
+	@SerialName("path")
+	PATH,
+}
 
 object HttpStatusCodeIntAsString : KSerializer<HttpStatusCode> {
 	override val descriptor: SerialDescriptor =

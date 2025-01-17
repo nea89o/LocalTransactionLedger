@@ -13,6 +13,7 @@ dependencies {
 	implementation("io.ktor:ktor-server-content-negotiation")
 	implementation("io.ktor:ktor-serialization-kotlinx-json")
 	implementation("io.ktor:ktor-server-compression")
+	implementation("io.ktor:ktor-server-cors")
 	implementation("sh.ondr:kotlin-json-schema:0.1.1")
 	implementation(project(":database:impl"))
 	implementation(project(":server:swagger"))
