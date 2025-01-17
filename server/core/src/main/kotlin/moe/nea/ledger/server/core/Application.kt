@@ -8,6 +8,7 @@ import io.ktor.server.plugins.compression.Compression
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.plugins.cors.routing.CORS
 import io.ktor.server.response.respondRedirect
+import io.ktor.server.routing.Routing
 import io.ktor.server.routing.get
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
@@ -27,8 +28,17 @@ fun main(args: Array<String>) {
 	EngineMain.main(args)
 }
 
+interface AIOProvider {
+	fun Routing.installExtraRouting()
+	fun Application.module()
+}
 
 fun Application.module() {
+	val aio = runCatching {
+		Class.forName("moe.nea.ledger.server.aio.AIO")
+			.newInstance() as AIOProvider
+	}.getOrNull()
+	aio?.run { module() }
 	install(Compression)
 	install(Documentation) {
 		info = Info(
@@ -50,7 +60,8 @@ fun Application.module() {
 	install(CORS) {
 		anyHost()
 	}
-	val database = Database(File(System.getProperty("ledger.databasefolder")))
+	val database = Database(File(System.getProperty("ledger.databasefolder",
+													"/home/nea/.local/share/PrismLauncher/instances/Skyblock/.minecraft/money-ledger")))
 	database.loadAndUpgrade()
 	routing {
 		route("/api") {
@@ -64,6 +75,7 @@ fun Application.module() {
 		route("/openapi") {
 			openApiUi("/api.json")
 		}
+		aio?.run { installExtraRouting() }
 	}
 }
 

@@ -22,5 +22,13 @@
     "@solidjs/router": "^0.15.3",
     "openapi-fetch": "^0.13.4",
     "solid-js": "^1.9.3"
-  }
+  },
+
+"devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "onFail": "error"
+    }
+  },
+  "packageManager": "pnpm@^9.3.0"
 }

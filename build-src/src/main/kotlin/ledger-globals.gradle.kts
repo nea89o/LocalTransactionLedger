@@ -1,3 +1,5 @@
+apply(plugin = "org.gradle.base")
+
 repositories {
 	mavenCentral()
 	maven("https://repo.nea.moe/releases/")
