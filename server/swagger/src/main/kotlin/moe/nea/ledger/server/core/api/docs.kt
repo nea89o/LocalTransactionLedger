@@ -1,6 +1,7 @@
 package moe.nea.ledger.server.core.api
 
 import io.ktor.http.ContentType
+import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.content.OutgoingContent
 import io.ktor.http.defaultForFilePath
@@ -99,36 +100,55 @@ internal class InputStreamContent(
 	override fun readFrom(): ByteReadChannel = input.toByteReadChannel(pool = KtorDefaultPool)
 }
 
-class DocumentationPath(val path: String) {
+class DocumentationPath(val path: String)
+
+class DocumentationEndpoint private constructor() {
+	var method: HttpMethod = HttpMethod.Get
+		private set
+	lateinit var path: DocumentationPath
+		private set
+
+	private fun initFromPath(
+		baseRoute: Route?,
+		route: RoutingNode,
+	) {
+		path = DocumentationPath(createRoutePath(baseRoute, route))
+	}
+
+	private fun createRoutePath(
+		baseRoute: Route?,
+		route: RoutingNode,
+	): String {
+		if (baseRoute == route)
+			return "/"
+		val parent = route.parent
+		if (parent == null) {
+			if (baseRoute != null)
+				error("Could not find $route in $baseRoute")
+			return "/"
+		}
+		val parentPath = createRoutePath(baseRoute, parent)
+		var parentPathAppendable = parentPath
+		if (!parentPathAppendable.endsWith("/"))
+			parentPathAppendable += "/"
+		return when (val selector = route.selector) {
+			is TrailingSlashRouteSelector -> parentPathAppendable
+			is RootRouteSelector -> parentPath
+			is PathSegmentConstantRouteSelector -> parentPathAppendable + selector.value
+			is HttpMethodRouteSelector -> {
+				method = selector.method
+				parentPath
+			}
+
+			else -> error("Could not comprehend $selector (${selector.javaClass})")
+		}
+	}
 
 	companion object {
-		fun createDocumentationPath(baseRoute: Route?, route: Route): DocumentationPath {
-			return DocumentationPath(createRoutePath(baseRoute, route as RoutingNode))
-		}
-
-		private fun createRoutePath(
-			baseRoute: Route?,
-			route: RoutingNode,
-		): String {
-			if (baseRoute == route)
-				return "/"
-			val parent = route.parent
-			if (parent == null) {
-				if (baseRoute != null)
-					error("Could not find $route in $baseRoute")
-				return "/"
-			}
-			var parentPath = createRoutePath(baseRoute, parent)
-			var parentPathAppendable = parentPath
-			if (!parentPathAppendable.endsWith("/"))
-				parentPathAppendable += "/"
-			return when (val selector = route.selector) {
-				is TrailingSlashRouteSelector -> parentPathAppendable
-				is RootRouteSelector -> parentPath
-				is PathSegmentConstantRouteSelector -> parentPathAppendable + selector.value
-				is HttpMethodRouteSelector -> parentPath // TODO: generate a separate path here
-				else -> error("Could not comprehend $selector (${selector.javaClass})")
-			}
+		fun createDocumentationPath(baseRoute: Route?, route: Route): DocumentationEndpoint {
+			val path = DocumentationEndpoint()
+			path.initFromPath(baseRoute, route as RoutingNode)
+			return path
 		}
 	}
 }
@@ -153,7 +173,7 @@ interface IntoTag {
 	fun intoTag(): String
 }
 
-class DocumentationContext(val path: DocumentationPath) {
+class DocumentationOperationContext(val route: DocumentationContext) {
 	val responses = mutableMapOf<HttpStatusCode, Response>()
 	fun responds(statusCode: HttpStatusCode, block: Response.() -> Unit) {
 		responses.getOrPut(statusCode) { Response() }.also(block)
@@ -176,22 +196,39 @@ class DocumentationContext(val path: DocumentationPath) {
 		tag.mapTo(tags) { it.intoTag() }
 	}
 
+	fun intoJson(): OpenApiOperation {
+		return OpenApiOperation(
+			tags = tags.map { Tag(it) },
+			summary = summary,
+			description = description,
+			operationId = operationId,
+			deprecated = deprecated,
+			responses = responses.mapValues {
+				it.value.intoJson()
+			}
+		)
+
+	}
+}
+
+class DocumentationContext(val path: DocumentationPath) {
+	val ops: MutableMap<HttpMethod, DocumentationOperationContext> = mutableMapOf()
+	var summary: String = ""
+	var description = ""
 	fun intoJson(): OpenApiRoute {
 		return OpenApiRoute(
 			summary,
 			description,
-			get = OpenApiOperation(
-				tags = tags.map { Tag(it) },
-				summary = summary,
-				description = description,
-				operationId = operationId,
-				deprecated = deprecated,
-				responses = responses.mapValues {
-					it.value.intoJson()
-				}
-			),
-			post = null, patch = null, delete = null, // TODO: generate separate contexts for those
+			get = ops[HttpMethod.Get]?.intoJson(),
+			put = ops[HttpMethod.Put]?.intoJson(),
+			post = ops[HttpMethod.Post]?.intoJson(),
+			patch = ops[HttpMethod.Patch]?.intoJson(),
+			delete = ops[HttpMethod.Delete]?.intoJson(),
 		)
+	}
+
+	fun createOperationNode(method: HttpMethod): DocumentationOperationContext {
+		return ops.getOrPut(method) { DocumentationOperationContext(this) }
 	}
 }
 
@@ -210,8 +247,9 @@ class Documentation(config: Configuration) {
 	val info = config.info
 	var root: RoutingNode? = null
 	private val documentationNodes = mutableMapOf<DocumentationPath, DocumentationContext>()
-	fun createDocumentationNode(path: DocumentationPath) =
-		documentationNodes.getOrPut(path) { DocumentationContext(path) }
+	fun createDocumentationNode(endpoint: DocumentationEndpoint) =
+		documentationNodes.getOrPut(endpoint.path) { DocumentationContext(endpoint.path) }
+			.createOperationNode(endpoint.method)
 
 	private val openApiJson by lazy {
 		OpenApiModel(
@@ -237,9 +275,9 @@ class Documentation(config: Configuration) {
 	}
 }
 
-fun Route.docs(block: DocumentationContext.() -> Unit) {
+fun Route.docs(block: DocumentationOperationContext.() -> Unit) {
 	val documentation = plugin(Documentation)
-	val documentationPath = DocumentationPath.createDocumentationPath(documentation.root, this)
+	val documentationPath = DocumentationEndpoint.createDocumentationPath(documentation.root, this)
 	val node = documentation.createDocumentationNode(documentationPath)
 	block(node)
 }

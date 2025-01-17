@@ -6,6 +6,8 @@ import io.ktor.server.application.install
 import io.ktor.server.netty.EngineMain
 import io.ktor.server.plugins.compression.Compression
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.server.response.respondRedirect
+import io.ktor.server.routing.get
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import kotlinx.serialization.json.Json
@@ -43,6 +45,7 @@ fun Application.module() {
 	routing {
 		route("/api") {
 			this.apiRouting(database)
+			get { call.respondRedirect("/openapi/") }
 		}
 		route("/api.json") {
 			openApiDocsJson()

@@ -28,6 +28,7 @@ data class OpenApiRoute(
 	val summary: String,
 	val description: String,
 	val get: OpenApiOperation?,
+	val put: OpenApiOperation?,
 	val patch: OpenApiOperation?,
 	val post: OpenApiOperation?,
 	val delete: OpenApiOperation?,
