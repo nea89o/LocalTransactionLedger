@@ -1,5 +1,3 @@
-import org.gradle.api.tasks.bundling.AbstractArchiveTask
-
 repositories {
 	mavenCentral()
 	maven("https://repo.nea.moe/releases/")
@@ -11,6 +9,7 @@ repositories {
 tasks.withType<AbstractArchiveTask> {
 	this.isPreserveFileTimestamps = false
 	this.isReproducibleFileOrder = true
+	this.archiveBaseName.set("ledger-" + project.path.replace(":", "-").trim('-'))
 }
 
 tasks.withType<Test> {
