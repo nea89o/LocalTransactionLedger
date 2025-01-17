@@ -12,11 +12,14 @@ import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import kotlinx.serialization.json.Json
 import moe.nea.ledger.database.Database
+import moe.nea.ledger.gen.BuildConfig
 import moe.nea.ledger.server.core.api.Documentation
 import moe.nea.ledger.server.core.api.Info
+import moe.nea.ledger.server.core.api.Server
 import moe.nea.ledger.server.core.api.apiRouting
 import moe.nea.ledger.server.core.api.openApiDocsJson
 import moe.nea.ledger.server.core.api.openApiUi
+import moe.nea.ledger.server.core.api.setApiRoot
 import java.io.File
 
 fun main(args: Array<String>) {
@@ -30,7 +33,10 @@ fun Application.module() {
 		info = Info(
 			"Ledger Analysis Server",
 			"Your local API for loading ledger data",
-			"TODO: buildconfig"
+			BuildConfig.VERSION
+		)
+		servers.add(
+			Server("http://localhost:8080/api", "Your Local Server")
 		)
 	}
 	install(ContentNegotiation) {
@@ -44,8 +50,9 @@ fun Application.module() {
 	database.loadAndUpgrade()
 	routing {
 		route("/api") {
-			this.apiRouting(database)
+			setApiRoot()
 			get { call.respondRedirect("/openapi/") }
+			apiRouting(database)
 		}
 		route("/api.json") {
 			openApiDocsJson()

@@ -2,6 +2,7 @@ plugins {
 	kotlin("jvm")
 	kotlin("plugin.serialization")
 	application
+	id("com.github.gmazzo.buildconfig")
 }
 
 
@@ -28,4 +29,7 @@ application {
 	applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment",
 									   "-Dledger.databasefolder=${project(":mod").file("run/money-ledger").absoluteFile}")
 	mainClass.set("moe.nea.ledger.server.core.ApplicationKt")
+}
+buildConfig {
+	packageName("moe.nea.ledger.gen")
 }

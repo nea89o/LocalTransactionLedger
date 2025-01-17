@@ -7,6 +7,8 @@ import io.ktor.http.content.OutgoingContent
 import io.ktor.http.defaultForFilePath
 import io.ktor.server.application.ApplicationCallPipeline
 import io.ktor.server.application.BaseApplicationPlugin
+import io.ktor.server.application.host
+import io.ktor.server.application.port
 import io.ktor.server.response.respond
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.HttpMethodRouteSelector
@@ -239,6 +241,12 @@ class Documentation(config: Configuration) {
 
 		override fun install(pipeline: ApplicationCallPipeline, configure: Configuration.() -> Unit): Documentation {
 			val config = Configuration().also(configure)
+			if (config.servers.isEmpty()) {
+				config.servers.add(Server(
+					"http://${pipeline.environment.config.host}:${pipeline.environment.config.port}",
+					"Server",
+				))
+			}
 			val plugin = Documentation(config)
 			return plugin
 		}
@@ -246,6 +254,9 @@ class Documentation(config: Configuration) {
 
 	val info = config.info
 	var root: RoutingNode? = null
+		private set
+	val servers: List<Server> = config.servers
+
 	private val documentationNodes = mutableMapOf<DocumentationPath, DocumentationContext>()
 	fun createDocumentationNode(endpoint: DocumentationEndpoint) =
 		documentationNodes.getOrPut(endpoint.path) { DocumentationContext(endpoint.path) }
@@ -254,8 +265,7 @@ class Documentation(config: Configuration) {
 	private val openApiJson by lazy {
 		OpenApiModel(
 			info = info,
-			// TODO: generate server list better
-			servers = listOf(Server("http://localhost:8080", "Local Server")),
+			servers = servers,
 			paths = documentationNodes.map {
 				OpenApiPath(it.key.path) to it.value.intoJson()
 			}.toMap()
@@ -266,12 +276,18 @@ class Documentation(config: Configuration) {
 		return openApiJson
 	}
 
+	fun setRootNode(routingNode: RoutingNode) {
+		require(documentationNodes.isEmpty()) { "Cannot set API root node after routes have been documented: ${documentationNodes.keys}" }
+		this.root = routingNode
+	}
+
 	class Configuration {
 		var info: Info = Info(
 			title = "Example API Docs",
 			description = "Missing description",
 			version = "0.0.0"
 		)
+		val servers: MutableList<Server> = mutableListOf()
 	}
 }
 
@@ -280,5 +296,12 @@ fun Route.docs(block: DocumentationOperationContext.() -> Unit) {
 	val documentationPath = DocumentationEndpoint.createDocumentationPath(documentation.root, this)
 	val node = documentation.createDocumentationNode(documentationPath)
 	block(node)
+}
+
+/**
+ * Mark this current routing node as API route. Note that this will not apply retroactively and all api requests must be declared relative to this one.
+ */
+fun Route.setApiRoot() {
+	plugin(Documentation).setRootNode(this as RoutingNode)
 }
 
