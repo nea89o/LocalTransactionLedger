@@ -15,7 +15,10 @@ jobs:
                 with:
                     distribution: temurin
                     java-version: 17
-
+            -   name: Setup PNPM
+                uses: pnpm/action-setup@v4
+                with:
+                    package_json_file: 'server/frontend/package.json'
             -   name: Setup Gradle
                 uses: gradle/actions/setup-gradle@v3
 
