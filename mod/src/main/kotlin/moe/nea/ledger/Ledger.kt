@@ -130,6 +130,7 @@ class Ledger {
 			AuctionHouseDetection::class.java,
 			BankDetection::class.java,
 			BankInterestDetection::class.java,
+			BasicReforgeDetection::class.java,
 			BazaarDetection::class.java,
 			BazaarOrderDetection::class.java,
 			BitsDetection::class.java,
@@ -162,7 +163,6 @@ class Ledger {
 			TriggerCommand::class.java,
 			UpdateChecker::class.java,
 			VisitorDetection::class.java,
-			BasicReforgeDetection::class.java,
 		)
 		val errorUtil = di.provide<ErrorUtil>()
 		errorUtil.catch {
