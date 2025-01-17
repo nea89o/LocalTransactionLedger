@@ -17,6 +17,7 @@ import moe.nea.ledger.modules.AllowanceDetection
 import moe.nea.ledger.modules.AuctionHouseDetection
 import moe.nea.ledger.modules.BankDetection
 import moe.nea.ledger.modules.BankInterestDetection
+import moe.nea.ledger.modules.BasicReforgeDetection
 import moe.nea.ledger.modules.BazaarDetection
 import moe.nea.ledger.modules.BazaarOrderDetection
 import moe.nea.ledger.modules.BitsDetection
@@ -161,6 +162,7 @@ class Ledger {
 			TriggerCommand::class.java,
 			UpdateChecker::class.java,
 			VisitorDetection::class.java,
+			BasicReforgeDetection::class.java,
 		)
 		val errorUtil = di.provide<ErrorUtil>()
 		errorUtil.catch {
