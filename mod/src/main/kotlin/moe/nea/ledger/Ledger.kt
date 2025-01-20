@@ -16,6 +16,7 @@ import moe.nea.ledger.modules.AccessorySwapperDetection
 import moe.nea.ledger.modules.AllowanceDetection
 import moe.nea.ledger.modules.AuctionHouseDetection
 import moe.nea.ledger.modules.BankDetection
+import moe.nea.ledger.modules.BankInterestDetection
 import moe.nea.ledger.modules.BazaarDetection
 import moe.nea.ledger.modules.BazaarOrderDetection
 import moe.nea.ledger.modules.BitsDetection
@@ -127,6 +128,7 @@ class Ledger {
 			AllowanceDetection::class.java,
 			AuctionHouseDetection::class.java,
 			BankDetection::class.java,
+			BankInterestDetection::class.java,
 			BazaarDetection::class.java,
 			BazaarOrderDetection::class.java,
 			BitsDetection::class.java,
