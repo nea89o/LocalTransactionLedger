@@ -4,95 +4,141 @@
  */
 
 export interface paths {
-  "/profiles": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/profiles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List all profiles and players known to ledger */
+        get: operations["listProfiles"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** List all profiles and players known to ledger */
-    get: operations["listProfiles"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/item": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/item": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get item names for item ids */
+        get: operations["getItemNames"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** Get item names for item ids */
-    get: operations["getItemNames"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
+    "/entries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get all log entries */
+        get: operations["getLogEntries"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
-  schemas: never;
-  responses: never;
-  parameters: never;
-  requestBodies: never;
-  headers: never;
-  pathItems: never;
+    schemas: never;
+    responses: never;
+    parameters: never;
+    requestBodies: never;
+    headers: never;
+    pathItems: never;
 }
 export type $defs = Record<string, never>;
 export interface operations {
-  listProfiles: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+    listProfiles: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        content: {
-          "application/json": {
-            playerId: string;
-            profileId: string;
-          }[];
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        playerId: string;
+                        profileId: string;
+                    }[];
+                };
+            };
         };
-      };
     };
-  };
-  getItemNames: {
-    parameters: {
-      query?: {
-        itemId?: string[];
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+    getItemNames: {
+        parameters: {
+            query?: {
+                itemId?: string[];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        content: {
-          "application/json": {
-            [key: string]: string;
-          };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: string;
+                    };
+                };
+            };
         };
-      };
     };
-  };
+    getLogEntries: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        type: "ACCESSORIES_SWAPPING" | "ALLOWANCE_GAIN" | "AUCTION_BOUGHT" | "AUCTION_LISTING_CHARGE" | "AUCTION_SOLD" | "AUTOMERCHANT_PROFIT_COLLECT" | "BANK_DEPOSIT" | "BANK_WITHDRAW" | "BAZAAR_BUY_INSTANT" | "BAZAAR_BUY_ORDER" | "BAZAAR_SELL_INSTANT" | "BAZAAR_SELL_ORDER" | "BITS_PURSE_STATUS" | "BOOSTER_COOKIE_ATE" | "CAPSAICIN_EYEDROPS_USED" | "COMMUNITY_SHOP_BUY" | "CORPSE_DESECRATED" | "DIE_ROLLED" | "DRACONIC_SACRIFICE" | "DUNGEON_CHEST_OPEN" | "FORGED" | "GOD_POTION_DRANK" | "GOD_POTION_MIXIN_DRANK" | "GUMMY_POLAR_BEAR_ATE" | "KAT_TIMESKIP" | "KAT_UPGRADE" | "KISMET_REROLL" | "KUUDRA_CHEST_OPEN" | "NPC_BUY" | "NPC_SELL" | "PEST_REPELLENT_USED" | "VISITOR_BARGAIN" | "WYRM_EVOKED";
+                        id: string;
+                        items: {
+                            itemId: string;
+                            /** @enum {string} */
+                            direction: "GAINED" | "TRANSFORM" | "SYNC" | "CATALYST" | "LOST";
+                            amount: number;
+                        }[];
+                    }[];
+                };
+            };
+        };
+    };
 }
