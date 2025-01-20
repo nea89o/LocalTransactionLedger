@@ -28,7 +28,7 @@ class BankInterestDetection {
         bankInterestPattern.useMatcher(event.message) {
             logger.logEntry(
                 LedgerEntry(
-                    TransactionType.BANK_WITHDRAW,
+                    TransactionType.BANK_INTEREST,
                     event.timestamp,
                     listOf(
                         ItemChange.gainCoins(parseShortNumber(group("coins"))),
@@ -39,7 +39,7 @@ class BankInterestDetection {
         offlineBankInterestPattern.useMatcher(event.message) {
             logger.logEntry(
                 LedgerEntry(
-                    TransactionType.BANK_WITHDRAW,
+                    TransactionType.BANK_INTEREST,
                     event.timestamp,
                     listOf(
                         ItemChange.gainCoins(parseShortNumber(group("coins"))),
