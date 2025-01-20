@@ -10,42 +10,35 @@ import moe.nea.ledger.parseShortNumber
 import moe.nea.ledger.useMatcher
 import moe.nea.ledger.utils.di.Inject
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.util.regex.Matcher
 import java.util.regex.Pattern
-
 
 class BankInterestDetection {
 
-    val bankInterestPattern =
-        Pattern.compile("You have just received (?<coins>$SHORT_NUMBER_PATTERN) coins as interest in your (co-op|personal) bank account!")
-    val offlineBankInterestPattern =
-        Pattern.compile("Since you've been away you earned (?<coins>$SHORT_NUMBER_PATTERN) coins as interest in your personal bank account!")
+	val bankInterestPattern =
+		Pattern.compile("You have just received (?<coins>$SHORT_NUMBER_PATTERN) coins as interest in your (co-op|personal) bank account!")
+	val offlineBankInterestPattern =
+		Pattern.compile("Since you've been away you earned (?<coins>$SHORT_NUMBER_PATTERN) coins as interest in your personal bank account!")
 
-    @Inject
-    lateinit var logger: LedgerLogger
+	@Inject
+	lateinit var logger: LedgerLogger
 
-    @SubscribeEvent
-    fun onChat(event: ChatReceived) {
-        bankInterestPattern.useMatcher(event.message) {
-            logger.logEntry(
-                LedgerEntry(
-                    TransactionType.BANK_INTEREST,
-                    event.timestamp,
-                    listOf(
-                        ItemChange.gainCoins(parseShortNumber(group("coins"))),
-                    )
-                )
-            )
-        }
-        offlineBankInterestPattern.useMatcher(event.message) {
-            logger.logEntry(
-                LedgerEntry(
-                    TransactionType.BANK_INTEREST,
-                    event.timestamp,
-                    listOf(
-                        ItemChange.gainCoins(parseShortNumber(group("coins"))),
-                    )
-                )
-            )
-        }
-    }
+
+	@SubscribeEvent
+	fun onChat(event: ChatReceived) {
+		fun Matcher.logInterest() {
+			logger.logEntry(
+				LedgerEntry(
+					TransactionType.BANK_INTEREST,
+					event.timestamp,
+					listOf(
+						ItemChange.gainCoins(parseShortNumber(group("coins"))),
+					)
+				)
+			)
+		}
+
+		bankInterestPattern.useMatcher(event.message) { logInterest() }
+		offlineBankInterestPattern.useMatcher(event.message) { logInterest() }
+	}
 }
