@@ -17,12 +17,13 @@ import moe.nea.ledger.modules.AllowanceDetection
 import moe.nea.ledger.modules.AuctionHouseDetection
 import moe.nea.ledger.modules.BankDetection
 import moe.nea.ledger.modules.BankInterestDetection
+import moe.nea.ledger.modules.BasicReforgeDetection
 import moe.nea.ledger.modules.BazaarDetection
 import moe.nea.ledger.modules.BazaarOrderDetection
 import moe.nea.ledger.modules.BitsDetection
 import moe.nea.ledger.modules.BitsShopDetection
 import moe.nea.ledger.modules.DragonEyePlacementDetection
-import moe.nea.ledger.modules.`DragonSacrificeDetection`
+import moe.nea.ledger.modules.DragonSacrificeDetection
 import moe.nea.ledger.modules.DungeonChestDetection
 import moe.nea.ledger.modules.ExternalDataProvider
 import moe.nea.ledger.modules.EyedropsDetection
@@ -91,7 +92,7 @@ class Ledger {
 	// You sold Cactus x1 for 3 Coins!
 	// You bought back Potato x3 for 9 Coins!
 
-	TODO: TRADING, FORGE, VISITORS / COPPER, CORPSES ÖFFNEN, HIGH / LOW GAMBLES, MINION ITEMS (maybe inferno refuel)
+	TODO: TRADING, FORGE, MINION ITEMS (maybe inferno refuel)
 	TODO: PET LEVELING COSTS AT FANN, SLAYER / MOB DROPS, SLAYER START COST
 	*/
 	companion object {
@@ -129,6 +130,7 @@ class Ledger {
 			AuctionHouseDetection::class.java,
 			BankDetection::class.java,
 			BankInterestDetection::class.java,
+			BasicReforgeDetection::class.java,
 			BazaarDetection::class.java,
 			BazaarOrderDetection::class.java,
 			BitsDetection::class.java,
