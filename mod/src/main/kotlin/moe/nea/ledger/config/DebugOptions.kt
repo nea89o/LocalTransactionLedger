@@ -2,6 +2,7 @@ package moe.nea.ledger.config
 
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import moe.nea.ledger.DevUtil
 
 class DebugOptions {
 	@ConfigOption(name = "Log entries to chat",
@@ -9,5 +10,5 @@ class DebugOptions {
 	@Transient
 	@ConfigEditorBoolean
 	@JvmField
-	var logEntries = false
+	var logEntries = DevUtil.isDevEnv
 }
