@@ -9,6 +9,14 @@ value class ULIDWrapper(
 	val wrapped: String
 ) {
 	companion object {
+		fun lowerBound(timestamp: Instant): ULIDWrapper {
+			return ULIDWrapper(ULID.generate(timestamp.toEpochMilli(), ByteArray(10)))
+		}
+
+		fun upperBound(timestamp: Instant): ULIDWrapper {
+			return ULIDWrapper(ULID.generate(timestamp.toEpochMilli(), ByteArray(10) { -1 }))
+		}
+
 		fun createULIDAt(timestamp: Instant): ULIDWrapper {
 			return ULIDWrapper(ULID.generate(
 				timestamp.toEpochMilli(),

@@ -1,11 +1,20 @@
-import type { Component } from "solid-js";
-import { A } from "@solidjs/router";
+import { For, Suspense, type Component } from "solid-js";
+import { A, createAsync } from "@solidjs/router";
+import { client, getAnalysisList } from "./api.ts";
 
 const App: Component = () => {
+  let analysis = createAsync(() => getAnalysisList());
   return (
     <>
-      Hello World
-      <A href="/test">Test Page</A>
+      <Suspense fallback="Loading analysis...">
+        <ul>
+          <For each={analysis()?.data}>
+            {item =>
+              <li><A href={`/analysis/${item.id}`}>{item.name}</A></li>
+            }
+          </For>
+        </ul>
+      </Suspense>
     </>
   );
 };

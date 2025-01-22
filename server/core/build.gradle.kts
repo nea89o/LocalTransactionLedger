@@ -15,6 +15,7 @@ dependencies {
 	api("io.ktor:ktor-server-compression")
 	api("io.ktor:ktor-server-cors")
 	api("sh.ondr:kotlin-json-schema:0.1.1")
+	api(project(":server:analysis"))
 	api(project(":database:impl"))
 	api(project(":server:swagger"))
 

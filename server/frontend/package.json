@@ -9,22 +9,25 @@
     "build": "vite build",
     "serve": "vite preview",
     "test:ts": "tsc --noEmit",
-    "genApi": "pnpx openapi-typescript http://localhost:8080/api.json -o src/api-schema.d.ts"
+    "genApi": "openapi-typescript http://localhost:8080/api.json -o src/api-schema.d.ts"
   },
   "license": "MIT",
   "devDependencies": {
     "openapi-typescript": "^7.5.2",
+    "solid-devtools": "^0.33.0",
     "typescript": "^5.7.2",
     "vite": "^6.0.0",
     "vite-plugin-solid": "^2.11.0"
   },
   "dependencies": {
     "@solidjs/router": "^0.15.3",
+    "apexcharts": "^4.3.0",
+    "moment": "^2.30.1",
     "openapi-fetch": "^0.13.4",
+    "solid-apexcharts": "^0.4.0",
     "solid-js": "^1.9.3"
   },
-
-"devEngines": {
+  "devEngines": {
     "packageManager": {
       "name": "pnpm",
       "onFail": "error"

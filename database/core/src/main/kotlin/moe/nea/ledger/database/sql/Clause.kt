@@ -2,9 +2,8 @@ package moe.nea.ledger.database.sql
 
 interface Clause : BooleanExpression {
 	companion object {
-		operator fun invoke(builder: ClauseBuilder.() -> Clause): Clause {
+		operator fun <T> invoke(builder: ClauseBuilder.() -> T): T {
 			return builder(ClauseBuilder())
 		}
 	}
-
 }

@@ -52,6 +52,7 @@ data class OpenApiParameter(
 	val name: String,
 	val description: String,
 	val schema: JsonSchema?,
+	val required: Boolean = true,
 )
 
 @Serializable

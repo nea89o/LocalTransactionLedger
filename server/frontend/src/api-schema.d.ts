@@ -21,6 +21,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/analysis/execute": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Execute an analysis on a given timeframe */
+        get: operations["executeAnalysis"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/analysis/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List all installed analysis */
+        get: operations["getAnalysis"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/item": {
         parameters: {
             query?: never;
@@ -89,10 +123,68 @@ export interface operations {
             };
         };
     };
+    executeAnalysis: {
+        parameters: {
+            query: {
+                /** @description An analysis id obtained from getAnalysis */
+                analysis: string;
+                /** @description The start of the timeframe to analyze */
+                tStart: number;
+                /** @description The end of the timeframe to analyze. Make sure to use the end of the day if you want the entire day included. */
+                tEnd: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        visualizations: {
+                            label: string;
+                            xLabel: string;
+                            yLabel: string;
+                            dataPoints: {
+                                time: number;
+                                value: number;
+                            }[];
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    getAnalysis: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        name: string;
+                        id: string;
+                    }[];
+                };
+            };
+        };
+    };
     getItemNames: {
         parameters: {
-            query?: {
-                itemId?: string[];
+            query: {
+                itemId: string[];
             };
             header?: never;
             path?: never;
@@ -128,7 +220,7 @@ export interface operations {
                 content: {
                     "application/json": {
                         /** @enum {string} */
-                        type: "ACCESSORIES_SWAPPING" | "ALLOWANCE_GAIN" | "AUCTION_BOUGHT" | "AUCTION_LISTING_CHARGE" | "AUCTION_SOLD" | "AUTOMERCHANT_PROFIT_COLLECT" | "BANK_DEPOSIT" | "BANK_WITHDRAW" | "BAZAAR_BUY_INSTANT" | "BAZAAR_BUY_ORDER" | "BAZAAR_SELL_INSTANT" | "BAZAAR_SELL_ORDER" | "BITS_PURSE_STATUS" | "BOOSTER_COOKIE_ATE" | "CAPSAICIN_EYEDROPS_USED" | "COMMUNITY_SHOP_BUY" | "CORPSE_DESECRATED" | "DIE_ROLLED" | "DRACONIC_SACRIFICE" | "DUNGEON_CHEST_OPEN" | "FORGED" | "GOD_POTION_DRANK" | "GOD_POTION_MIXIN_DRANK" | "GUMMY_POLAR_BEAR_ATE" | "KAT_TIMESKIP" | "KAT_UPGRADE" | "KISMET_REROLL" | "KUUDRA_CHEST_OPEN" | "NPC_BUY" | "NPC_SELL" | "PEST_REPELLENT_USED" | "VISITOR_BARGAIN" | "WYRM_EVOKED";
+                        type: "ACCESSORIES_SWAPPING" | "ALLOWANCE_GAIN" | "AUCTION_BOUGHT" | "AUCTION_LISTING_CHARGE" | "AUCTION_SOLD" | "AUTOMERCHANT_PROFIT_COLLECT" | "BANK_DEPOSIT" | "BANK_INTEREST" | "BANK_WITHDRAW" | "BASIC_REFORGE" | "BAZAAR_BUY_INSTANT" | "BAZAAR_BUY_ORDER" | "BAZAAR_SELL_INSTANT" | "BAZAAR_SELL_ORDER" | "BITS_PURSE_STATUS" | "BOOSTER_COOKIE_ATE" | "CAPSAICIN_EYEDROPS_USED" | "COMMUNITY_SHOP_BUY" | "CORPSE_DESECRATED" | "DIE_ROLLED" | "DRACONIC_SACRIFICE" | "DUNGEON_CHEST_OPEN" | "FORGED" | "GOD_POTION_DRANK" | "GOD_POTION_MIXIN_DRANK" | "GUMMY_POLAR_BEAR_ATE" | "KAT_TIMESKIP" | "KAT_UPGRADE" | "KISMET_REROLL" | "KUUDRA_CHEST_OPEN" | "NPC_BUY" | "NPC_SELL" | "PEST_REPELLENT_USED" | "VISITOR_BARGAIN" | "WYRM_EVOKED";
                         id: string;
                         items: {
                             itemId: string;

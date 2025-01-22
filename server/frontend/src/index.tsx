@@ -1,5 +1,6 @@
 /* @refresh reload */
 import { render } from "solid-js/web";
+import 'solid-devtools';
 
 import "./index.css";
 import type { RouteDefinition } from "@solidjs/router";
@@ -16,6 +17,7 @@ if (!(root instanceof HTMLElement)) {
 const routes: Array<RouteDefinition> = [
   { path: "/", component: lazy(() => import("./App.tsx")) },
   { path: "/test/", component: lazy(() => import("./Test.tsx")) },
+  { path: "/analysis/:id", component: lazy(() => import("./Analysis.tsx")) },
 ];
 
 render(() => <Router>{routes}</Router>, root!);
