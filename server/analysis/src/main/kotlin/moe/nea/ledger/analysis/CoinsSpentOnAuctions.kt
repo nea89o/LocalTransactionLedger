@@ -20,15 +20,9 @@ class CoinsSpentOnAuctions : Analysis {
 	override fun perform(database: Connection, filter: AnalysisFilter): AnalysisResult {
 		val query = DBLogEntry.from(database)
 			.join(DBItemEntry, Clause { column(DBItemEntry.transactionId) eq column(DBLogEntry.transactionId) })
-			.where(Clause {
-				(column(DBItemEntry.itemId) eq string(ItemId.COINS.string))
-			})
-			.where(Clause {
-				(column(DBItemEntry.mode) eq string(ItemChange.ChangeDirection.LOST.name))
-			})
-			.where(Clause {
-				(column(DBLogEntry.type) eq string(TransactionType.AUCTION_BOUGHT.name))
-			})
+			.where(Clause { column(DBItemEntry.itemId) eq ItemId.COINS })
+			.where(Clause { column(DBItemEntry.mode) eq ItemChange.ChangeDirection.LOST })
+			.where(Clause { column(DBLogEntry.type) eq TransactionType.AUCTION_BOUGHT })
 			.select(DBItemEntry.size, DBLogEntry.transactionId)
 		filter.applyTo(query)
 		val spentThatDay = mutableMapOf<LocalDate, Double>()
