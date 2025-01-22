@@ -6,7 +6,7 @@ import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.util.UUID
 
-object DBUuid : DBType<UUID> {
+object DBUuid : DBType<UUID, String> {
 	override val dbType: String
 		get() = "TEXT"
 

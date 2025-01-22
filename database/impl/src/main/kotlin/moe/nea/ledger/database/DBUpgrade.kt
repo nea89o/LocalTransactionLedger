@@ -37,14 +37,14 @@ interface DBUpgrade {
 			return upgrades.groupBy { it.toVersion }
 		}
 
-		fun createTable(to: Long, table: Table, vararg columns: Column<*>): DBUpgrade {
+		fun createTable(to: Long, table: Table, vararg columns: Column<*, *>): DBUpgrade {
 			require(columns.all { it in table.columns })
 			return of("Create table ${table}", to) {
 				table.createIfNotExists(it, columns.toList())
 			}
 		}
 
-		fun addColumns(to: Long, table: Table, vararg columns: Column<*>): DBUpgrade {
+		fun addColumns(to: Long, table: Table, vararg columns: Column<*, *>): DBUpgrade {
 			return of("Add columns to table $table", to) {
 				table.alterTableAddColumns(it, columns.toList())
 			}

@@ -5,7 +5,7 @@ import moe.nea.ledger.database.DBType
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 
-object DBUlid : DBType<ULIDWrapper> {
+object DBUlid : DBType<ULIDWrapper, String> {
 	override val dbType: String
 		get() = "TEXT"
 

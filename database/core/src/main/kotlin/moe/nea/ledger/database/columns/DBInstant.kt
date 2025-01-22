@@ -5,7 +5,7 @@ import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.time.Instant
 
-object DBInstant : DBType<Instant> {
+object DBInstant : DBType<Instant, Long> {
 	override val dbType: String
 		get() = "INTEGER"
 

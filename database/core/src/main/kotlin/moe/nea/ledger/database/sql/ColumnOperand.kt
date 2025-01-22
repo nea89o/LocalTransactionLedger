@@ -3,7 +3,7 @@ package moe.nea.ledger.database.sql
 import moe.nea.ledger.database.Column
 import java.sql.PreparedStatement
 
-data class ColumnOperand<T>(val column: Column<T>) : Operand<T> {
+data class ColumnOperand<T, Raw>(val column: Column<T, Raw>) : Operand<T, Raw> {
 	override fun asSql(): String {
 		return column.qualifiedSqlName
 	}

@@ -6,7 +6,7 @@ import java.sql.ResultSet
 
 class DBEnum<T : Enum<T>>(
 	val type: Class<T>,
-) : DBType<T> {
+) : DBType<T, String> {
 	companion object {
 		inline operator fun <reified T : Enum<T>> invoke(): DBEnum<T> {
 			return DBEnum(T::class.java)

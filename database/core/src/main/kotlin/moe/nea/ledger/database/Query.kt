@@ -12,7 +12,7 @@ import java.sql.Connection
 
 class Query(
 	val connection: Connection,
-	val selectedColumns: MutableList<Selectable<*>>,
+	val selectedColumns: MutableList<Selectable<*, *>>,
 	var table: Table,
 	var limit: UInt? = null,
 	var skip: UInt? = null,

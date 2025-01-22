@@ -15,6 +15,4 @@ class Upgrades {
 			DBItemEntry.itemId, DBItemEntry.size, DBItemEntry.mode, DBItemEntry.transactionId
 		))
 	}
-
-
 }

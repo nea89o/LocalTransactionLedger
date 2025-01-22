@@ -4,15 +4,15 @@ import java.sql.Connection
 
 abstract class Table(val name: String) {
 	val sqlName get() = "`$name`"
-	protected val _mutable_columns: MutableList<Column<*>> = mutableListOf()
+	protected val _mutable_columns: MutableList<Column<*, *>> = mutableListOf()
 	protected val _mutable_constraints: MutableList<Constraint> = mutableListOf()
-	val columns: List<Column<*>> get() = _mutable_columns
+	val columns: List<Column<*, *>> get() = _mutable_columns
 	val constraints get() = _mutable_constraints
-	protected fun unique(vararg columns: Column<*>) {
+	protected fun unique(vararg columns: Column<*, *>) {
 		_mutable_constraints.add(UniqueConstraint(columns.toList()))
 	}
 
-	protected fun <T> column(name: String, type: DBType<T>): Column<T> {
+	protected fun <T, R> column(name: String, type: DBType<T, R>): Column<T, R> {
 		@Suppress("DEPRECATION") val column = Column(this, name, type)
 		_mutable_columns.add(column)
 		return column
@@ -39,7 +39,7 @@ abstract class Table(val name: String) {
 
 	fun createIfNotExists(
 		connection: Connection,
-		filteredColumns: List<Column<*>> = columns
+		filteredColumns: List<Column<*, *>> = columns
 	) {
 		val properties = mutableListOf<String>()
 		for (column in filteredColumns) {
@@ -57,7 +57,7 @@ abstract class Table(val name: String) {
 
 	fun alterTableAddColumns(
 		connection: Connection,
-		newColumns: List<Column<*>>
+		newColumns: List<Column<*, *>>
 	) {
 		for (column in newColumns) {
 			connection.prepareAndLog("ALTER TABLE $sqlName ADD ${column.sqlName} ${column.type.dbType}")
@@ -88,7 +88,7 @@ abstract class Table(val name: String) {
 		val statement =
 			connection.prepareAndLog("INSERT OR ${onConflict.asSql()} INTO $sqlName ($columnNames) VALUES ($valueNames)")
 		for ((index, column) in columns.withIndex()) {
-			(column as Column<Any>).type.set(statement, index + 1, insert.properties[column]!!)
+			(column as Column<Any, *>).type.set(statement, index + 1, insert.properties[column]!!)
 		}
 		statement.execute()
 	}

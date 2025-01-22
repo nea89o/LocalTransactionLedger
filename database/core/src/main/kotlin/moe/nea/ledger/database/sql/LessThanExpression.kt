@@ -2,7 +2,7 @@ package moe.nea.ledger.database.sql
 
 import java.sql.PreparedStatement
 
-class LessThanExpression(val lhs: Operand<*>, val rhs: Operand<*>) :
+class LessThanExpression(val lhs: Operand<*, *>, val rhs: Operand<*, *>) :
 	BooleanExpression {
 	override fun asSql(): String {
 		return "${lhs.asSql()} < ${rhs.asSql()}"

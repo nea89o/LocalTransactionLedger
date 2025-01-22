@@ -10,7 +10,10 @@ data class ANDExpression(
 	}
 
 	override fun asSql(): String {
-		return (elements + SQLQueryComponent.standalone("TRUE")).joinToString(" AND ", "(", ")") { it.asSql() }
+		elements.singleOrNull()?.let {
+			return "(" + it.asSql() + ")"
+		}
+		return elements.joinToString(" AND ", "(", ")") { it.asSql() }
 	}
 
 	override fun appendToStatement(stmt: PreparedStatement, startIndex: Int): Int {

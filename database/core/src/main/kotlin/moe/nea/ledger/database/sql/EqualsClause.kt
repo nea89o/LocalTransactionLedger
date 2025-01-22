@@ -2,7 +2,7 @@ package moe.nea.ledger.database.sql
 
 import java.sql.PreparedStatement
 
-data class EqualsClause(val left: Operand<*>, val right: Operand<*>) : Clause { // TODO: typecheck this somehow
+data class EqualsClause(val left: Operand<*, *>, val right: Operand<*, *>) : Clause {
 	override fun asSql(): String {
 		return left.asSql() + " = " + right.asSql()
 	}

@@ -2,7 +2,7 @@ package moe.nea.ledger.database.sql
 
 import java.sql.PreparedStatement
 
-data class LikeClause<T>(val left: Operand<T>, val right: StringOperand) : Clause {
+data class LikeClause<T>(val left: Operand<T, String>, val right: StringOperand) : Clause {
 	//TODO: check type safety with this one
 	override fun asSql(): String {
 		return "(" + left.asSql() + " LIKE " + right.asSql() + ")"

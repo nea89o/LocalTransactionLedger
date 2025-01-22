@@ -4,7 +4,7 @@ import moe.nea.ledger.database.DBType
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 
-object DBDouble : DBType<Double> {
+object DBDouble : DBType<Double, Double> {
 	override val dbType: String
 		get() = "DOUBLE"
 

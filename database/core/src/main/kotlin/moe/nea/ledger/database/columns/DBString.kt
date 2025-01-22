@@ -4,7 +4,7 @@ import moe.nea.ledger.database.DBType
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 
-object DBString : DBType<String> {
+object DBString : DBType<String, String> {
 	override val dbType: String
 		get() = "TEXT"
 

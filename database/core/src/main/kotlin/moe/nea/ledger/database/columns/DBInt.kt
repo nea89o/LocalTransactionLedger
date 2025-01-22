@@ -4,7 +4,7 @@ import moe.nea.ledger.database.DBType
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 
-object DBInt : DBType<Long> {
+object DBInt : DBType<Long, Long> {
 	override val dbType: String
 		get() = "INTEGER"
 
