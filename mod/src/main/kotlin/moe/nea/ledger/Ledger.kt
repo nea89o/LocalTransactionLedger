@@ -29,6 +29,7 @@ import moe.nea.ledger.modules.ExternalDataProvider
 import moe.nea.ledger.modules.EyedropsDetection
 import moe.nea.ledger.modules.ForgeDetection
 import moe.nea.ledger.modules.GambleDetection
+import moe.nea.ledger.modules.GhostCoinDropDetection
 import moe.nea.ledger.modules.GodPotionDetection
 import moe.nea.ledger.modules.GodPotionMixinDetection
 import moe.nea.ledger.modules.GummyPolarBearDetection
@@ -145,6 +146,7 @@ class Ledger {
 			EyedropsDetection::class.java,
 			ForgeDetection::class.java,
 			GambleDetection::class.java,
+			GhostCoinDropDetection::class.java,
 			GodPotionDetection::class.java,
 			GodPotionMixinDetection::class.java,
 			GummyPolarBearDetection::class.java,
