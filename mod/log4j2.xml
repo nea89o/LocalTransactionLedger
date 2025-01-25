@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="WARN">
     <!-- Filter out Hypixel scoreboard and sound errors -->
-    <RegexFilter regex="Error executing task.*|Unable to play unknown soundEvent.*" onMatch="DENY" onMismatch="NEUTRAL"/>
+    <RegexFilter regex="Unable to play unknown soundEvent.*" onMatch="DENY" onMismatch="NEUTRAL"/>
+    <RegexFilter regex="Zip file .* failed to read properly, it will be ignored.*" onMatch="DENY" onMismatch="NEUTRAL"/>
+    <RegexFilter regex="There was a problem reading the entry META-INF/versions/9/.* in the jar .* - probably a corrupt zip" onMatch="DENY" onMismatch="NEUTRAL"/>
+    <RegexFilter regex="Unable to read a class file correctly" onMatch="DENY" onMismatch="NEUTRAL"/>
+    <RegexFilter regex="Error executing task" onMatch="DENY" onMismatch="NEUTRAL"/>
 </Configuration>
