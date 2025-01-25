@@ -11,6 +11,25 @@ interface SQLQueryComponent {
 	fun appendToStatement(stmt: PreparedStatement, startIndex: Int): Int
 
 	companion object {
+		fun composite(vararg elements: SQLQueryComponent): SQLQueryComponent {
+			return object : SQLQueryComponent {
+				override fun asSql(): String {
+					return elements.joinToString(" ") { it.asSql() }
+				}
+
+				override fun appendToStatement(stmt: PreparedStatement, startIndex: Int): Int {
+					var index = startIndex
+					for (element in elements) {
+						val lastIndex = index
+						index = element.appendToStatement(stmt, index)
+						require(lastIndex <= index) { "$element just tried to go back in time $index < $lastIndex" }
+					}
+					return index
+
+				}
+			}
+		}
+
 		fun standalone(sql: String): SQLQueryComponent {
 			return object : SQLQueryComponent {
 				override fun asSql(): String {

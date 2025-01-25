@@ -13,7 +13,7 @@ interface AnalysisFilter {
 	fun applyTo(query: Query) {
 		query.where(Clause { column(DBLogEntry.transactionId) ge value(DBUlid, ULIDWrapper.lowerBound(startWindow)) })
 			.where(Clause { column(DBLogEntry.transactionId) le value(DBUlid, ULIDWrapper.upperBound(endWindow)) })
-		// TODO: apply profiles filter
+//TODO: 			.where(Clause { column(DBLogEntry.profileId) inList profiles })
 	}
 
 	fun timeZone(): ZoneId {

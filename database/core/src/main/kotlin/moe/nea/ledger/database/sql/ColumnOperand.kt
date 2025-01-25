@@ -4,7 +4,7 @@ import moe.nea.ledger.database.Column
 import moe.nea.ledger.database.DBType
 import java.sql.PreparedStatement
 
-data class ColumnOperand<T, Raw>(val column: Column<T, Raw>) : TypedOperand<T, Raw>() {
+data class ColumnOperand<T, Raw>(val column: Column<T, Raw>) : TypedOperand<T, Raw> {
 	override val dbType: DBType<T, Raw>
 		get() = column.type
 
