@@ -25,6 +25,7 @@ class GhostCoinDropDetection {
         ghostCoinPattern.useMatcher(event.message) {
             logger.logEntry(
                 LedgerEntry(
+	                // TODO: merge this into a generic mob drop tt
                     TransactionType.GHOST_COIN_DROP,
                     event.timestamp,
                     listOf(
