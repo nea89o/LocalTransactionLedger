@@ -2,9 +2,10 @@ package moe.nea.ledger.utils.telemetry
 
 class Span(val parent: Span?) : AutoCloseable {
 	companion object {
+		val rootSpan = Span(null)
 		private val _current = object : InheritableThreadLocal<Span>() {
 			override fun initialValue(): Span {
-				return Span(null)
+				return Span(rootSpan)
 			}
 
 			override fun childValue(parentValue: Span?): Span {

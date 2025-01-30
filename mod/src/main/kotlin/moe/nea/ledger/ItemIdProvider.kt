@@ -20,12 +20,12 @@ class ItemIdProvider {
 	@SubscribeEvent
 	fun onMouseInput(event: GuiScreenEvent.MouseInputEvent.Pre) {
 		if (Mouse.getEventButton() == -1) return
-		MinecraftForge.EVENT_BUS.post(BeforeGuiAction(event.gui))
+		BeforeGuiAction(event.gui).post()
 	}
 
 	@SubscribeEvent
 	fun onKeyInput(event: GuiScreenEvent.KeyboardInputEvent.Pre) {
-		MinecraftForge.EVENT_BUS.post(BeforeGuiAction(event.gui))
+		BeforeGuiAction(event.gui).post()
 	}
 
 	private val knownNames = mutableMapOf<String, ItemId>()

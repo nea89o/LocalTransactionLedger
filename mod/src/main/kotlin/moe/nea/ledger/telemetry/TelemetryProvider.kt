@@ -1,8 +1,10 @@
-package moe.nea.ledger
+package moe.nea.ledger.telemetry
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
+import moe.nea.ledger.DevUtil
+import moe.nea.ledger.Ledger
 import moe.nea.ledger.gen.BuildConfig
 import moe.nea.ledger.utils.di.DI
 import moe.nea.ledger.utils.di.DIProvider
@@ -40,7 +42,7 @@ object TelemetryProvider {
 	}
 
 	fun setupDefaultSpan() {
-		val sp = Span.current()
+		val sp = Span.rootSpan
 		sp.add(USER, MinecraftUser(Minecraft.getMinecraft().session))
 		sp.add(MINECRAFT_VERSION, ContextValue.compound(
 			"static" to "1.8.9",

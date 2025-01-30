@@ -172,7 +172,7 @@ class QueryCommand : CommandBase() {
 		override val name: String
 			get() = "withitem"
 
-		private val itemIdProvider = Ledger.di.provide<ItemIdProvider>() // TODO: close this escape hatch
+		private val itemIdProvider = Ledger.leakDI().provide<ItemIdProvider>() // TODO: close this escape hatch
 		override fun getFilter(text: String): BooleanExpression {
 			return Clause { column(DBItemEntry.itemId) like text }
 		}

@@ -42,6 +42,7 @@ import moe.nea.ledger.modules.NpcDetection
 import moe.nea.ledger.modules.PestRepellentDetection
 import moe.nea.ledger.modules.UpdateChecker
 import moe.nea.ledger.modules.VisitorDetection
+import moe.nea.ledger.telemetry.TelemetryProvider
 import moe.nea.ledger.utils.ErrorUtil
 import moe.nea.ledger.utils.MinecraftExecutor
 import moe.nea.ledger.utils.di.DI
@@ -112,7 +113,9 @@ class Ledger {
 			tickQueue.add(runnable)
 		}
 
-		val di = DI()
+		private val di = DI()
+
+		fun leakDI() = di
 	}
 
 	@Mod.EventHandler
