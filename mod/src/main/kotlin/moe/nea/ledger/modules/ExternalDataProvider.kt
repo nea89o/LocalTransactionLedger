@@ -14,6 +14,7 @@ import java.util.concurrent.CompletableFuture
 class ExternalDataProvider @Inject constructor(
 	val requestUtil: RequestUtil
 ) {
+	// TODO: Save all the data locally, so in case of a failed request older versions can be used
 
 	fun createAuxillaryDataRequest(path: String): Request {
 		return requestUtil.createRequest("https://github.com/nea89o/ledger-auxiliary-data/raw/refs/heads/master/$path")
@@ -22,7 +23,9 @@ class ExternalDataProvider @Inject constructor(
 	private val itemNameFuture: CompletableFuture<Map<String, String>> = CompletableFuture.supplyAsync {
 		val request = createAuxillaryDataRequest("data/item_names.json")
 		val response = request.execute(requestUtil)
-		val nameMap = response.json(GsonUtil.typeToken<Map<String, String>>())
+		val nameMap =
+			response?.json(GsonUtil.typeToken<Map<String, String>>())
+				?: mapOf()
 		return@supplyAsync nameMap
 	}
 

@@ -18,7 +18,8 @@ pluginManagement {
 				"gg.essential.loom" -> useModule("gg.essential:architectury-loom:${requested.version}")
 			}
 		}
-	}}
+	}
+}
 
 plugins {
 	id("org.gradle.toolchains.foojay-resolver-convention") version ("0.8.0")

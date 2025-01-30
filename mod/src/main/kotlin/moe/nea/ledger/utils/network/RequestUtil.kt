@@ -2,6 +2,8 @@ package moe.nea.ledger.utils.network
 
 import moe.nea.ledger.utils.ErrorUtil
 import moe.nea.ledger.utils.di.Inject
+import moe.nea.ledger.utils.telemetry.CommonKeys
+import moe.nea.ledger.utils.telemetry.ContextValue
 import java.net.URL
 import java.net.URLConnection
 import java.security.KeyStore
@@ -38,7 +40,10 @@ class RequestUtil @Inject constructor(val errorUtil: ErrorUtil) {
 	fun createRequest(url: String) = createRequest(URL(url))
 	fun createRequest(url: URL) = Request(url, Request.Method.GET, null, mapOf())
 
-	fun executeRequest(request: Request): Response {
+	fun executeRequest(request: Request): Response? = errorUtil.catch(
+		CommonKeys.EVENT_MESSAGE to ContextValue.string("Failed to execute request"),
+		RequestTrace.createTrace(request)
+	) {
 		val connection = request.url.openConnection()
 		enhanceConnection(connection)
 		connection.setRequestProperty("accept-encoding", "gzip")
@@ -56,7 +61,7 @@ class RequestUtil @Inject constructor(val errorUtil: ErrorUtil) {
 		val text = stream.bufferedReader().readText()
 		stream.close()
 		// Do NOT call connection.disconnect() to allow for connection reuse
-		return Response(request, text, connection.headerFields)
+		return@catch Response(request, text, connection.headerFields)
 	}
 
 
