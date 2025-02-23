@@ -40,6 +40,7 @@ import moe.nea.ledger.modules.MineshaftCorpseDetection
 import moe.nea.ledger.modules.MinionDetection
 import moe.nea.ledger.modules.NpcDetection
 import moe.nea.ledger.modules.PestRepellentDetection
+import moe.nea.ledger.modules.StonksAuctionDetection
 import moe.nea.ledger.modules.UpdateChecker
 import moe.nea.ledger.modules.VisitorDetection
 import moe.nea.ledger.telemetry.TelemetryProvider
@@ -167,6 +168,7 @@ class Ledger {
 			PestRepellentDetection::class.java,
 			QueryCommand::class.java,
 			RequestUtil::class.java,
+			StonksAuctionDetection::class.java,
 			TriggerCommand::class.java,
 			UpdateChecker::class.java,
 			VisitorDetection::class.java,
