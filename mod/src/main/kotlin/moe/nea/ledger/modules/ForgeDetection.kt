@@ -21,6 +21,7 @@ class ForgeDetection {
 		val slot = event.slotIn ?: return
 		val clickedItem = slot.stack ?: return
 		if (clickedItem.displayName.unformattedString() != "Confirm") return
+		if (clickedItem.itemDamage == 14) return
 		val furnaceSlotName = slot.inventory.getStackInSlot(furnaceSlot)?.displayName?.unformattedString() ?: return
 		if (!furnaceName.matches(furnaceSlotName))
 			return
