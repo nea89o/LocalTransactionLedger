@@ -9,6 +9,7 @@ import moe.nea.ledger.getInternalId
 import moe.nea.ledger.matches
 import moe.nea.ledger.unformattedString
 import moe.nea.ledger.utils.di.Inject
+import net.minecraft.item.EnumDyeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.time.Instant
 
@@ -20,8 +21,9 @@ class ForgeDetection {
 	fun onClick(event: GuiClickEvent) {
 		val slot = event.slotIn ?: return
 		val clickedItem = slot.stack ?: return
+		val dyeColor = EnumDyeColor.byMetadata(clickedItem.itemDamage)
 		if (clickedItem.displayName.unformattedString() != "Confirm") return
-		if (clickedItem.itemDamage == 14) return
+		if (dyeColor == EnumDyeColor.RED) return
 		val furnaceSlotName = slot.inventory.getStackInSlot(furnaceSlot)?.displayName?.unformattedString() ?: return
 		if (!furnaceName.matches(furnaceSlotName))
 			return
