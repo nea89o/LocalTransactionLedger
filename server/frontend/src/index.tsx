@@ -5,7 +5,7 @@ import 'solid-devtools';
 import "./index.css";
 import type { RouteDefinition } from "@solidjs/router";
 import { Router } from "@solidjs/router";
-import { lazy } from "solid-js";
+import { lazy, onMount } from "solid-js";
 
 const root = document.getElementById("root");
 
@@ -20,4 +20,11 @@ const routes: Array<RouteDefinition> = [
   { path: "/analysis/:id", component: lazy(() => import("./Analysis.tsx")) },
 ];
 
-render(() => <Router>{routes}</Router>, root!);
+const Root = () => {
+
+  return <div class="bg-gray-800 text-white min-h-[100vh]">
+    <Router>{routes}</Router>
+  </div>
+}
+
+render(() => <Root />, root!);

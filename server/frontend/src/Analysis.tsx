@@ -2,6 +2,7 @@ import { createAsync, useParams } from "@solidjs/router"
 import { client, getAnalysisList, paths } from "./api.ts";
 import { createSignal, For, onMount, Show, Suspense } from "solid-js";
 import { SolidApexCharts } from "solid-apexcharts";
+import { BarChart, times } from "chartist";
 
 type AnalysisResult =
     { status: 'not requested' }
@@ -13,11 +14,11 @@ export default function Analysis() {
     const analysisId = pathParams.id!;
     let analysis = createAsync(() => getAnalysisList());
     const analysisName = () => analysis()?.data?.find(it => it.id == analysisId)?.name
-    const [startTimestamp, setStartTimestamp] = createSignal(new Date().getTime() - 1000 * 60 * 60 * 24 * 30);
+    const [startTimestamp, setStartTimestamp] = createSignal(new Date().getTime() - 1000 * 60 * 60 * 24 * 356);
     const [endTimestamp, setEndTimestamp] = createSignal(new Date().getTime());
     const [analysisResult, setAnalysisResult] = createSignal<AnalysisResult>({ status: 'not requested' });
     return <>
-        <h1><Suspense fallback="Name not loaded...">{analysisName()}</Suspense></h1>
+        <h1 class="text-xl"><Suspense fallback="Name not loaded...">{analysisName()}</Suspense></h1>
         <p>
             <label>
                 Start:
@@ -52,13 +53,42 @@ export default function Analysis() {
                 {element =>
                     <For each={element().result.visualizations}>
                         {item =>
-                            <div>
+                            <div class="h-300 max-h-[90vh]">
                                 <SolidApexCharts
-                                    width={1200}
                                     type="bar"
+                                    width={"100%"}
+                                    height={"100%"}
                                     options={{
+                                        colors: ['#b03060'],
                                         xaxis: {
-                                            type: 'numeric'
+                                            labels: {
+                                                style: {
+                                                    colors: '#A0A0A0',
+                                                },
+                                                formatter(value, timestamp, opts) {
+                                                    return formatDate(timestamp!)
+                                                },
+                                            },
+                                            type: 'numeric',
+                                        },
+                                        tooltip: {
+                                            enabled: false
+                                        },
+                                        yaxis: {
+                                            labels: {
+                                                style: {
+                                                    colors: '#A0A0A0'
+                                                },
+                                                formatter(val, opts) {
+                                                    return formatMoney(val)
+                                                }
+                                            },
+                                            decimalsInFloat: 3
+                                        },
+                                        dataLabels: {
+                                            formatter(val, opts) {
+                                                return formatMoney(val as number)
+                                            },
                                         }
                                     }}
                                     series={[
@@ -74,6 +104,29 @@ export default function Analysis() {
             </Show>
         </p >
     </>
+}
+
+const formatMoney = (money: number): string => {
+    if (money < 0) return `-${formatMoney(money)}`
+    const moneyNames = [
+        [1_000_000_000, 'b'],
+        [1_000_000, 'm'],
+        [1_000, 'k'],
+        [1, '']
+    ] as const;
+
+    for (const [factor, name] of moneyNames) {
+        if (money >= factor) {
+            const scaledValue = Math.round(money / factor * 10) / 10
+            return `${scaledValue}${name}`
+        }
+    }
+    return money.toString()
+}
+
+const formatDate = (date: number | Date) => {
+    const _date = new Date(date);
+    return `${_date.getDay()}.${_date.getMonth() + 1}.${_date.getFullYear()}`
 }
 
 function takeIf<T extends P, P>(
